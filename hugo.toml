@@ -46,6 +46,12 @@ enableGitInfo = false
   pager = true
   post_meta = ["date", "categories"]
   mainSections = ["post"]
+  # 品牌图标（取自 omaps-web/public，与产品端一致）；favicon.ico 由主题模板引用，
+  # SVG / apple-touch-icon 在这里补挂
+  CustomHeadHTML = '''
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+'''
   # Google Fonts 已在 layouts/_partials/head/gfonts.html 中整体关闭
   customCSS = ["/css/omaps.css"]
   dateFormat = "2006-01-02"
