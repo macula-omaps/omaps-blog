@@ -1,7 +1,14 @@
+# Hugo
+public/
+resources/_gen/
+.hugo_build.lock
+
+# OS / 编辑器
 .DS_Store
 Thumbs.db
-db.json
 *.log
-node_modules/
-public/
-.deploy*/
+.idea/
+.vscode/
+
+# 本地 agent 记忆
+.workbuddy/

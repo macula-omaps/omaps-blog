@@ -1,0 +1,25 @@
+/* 麦扑科技 OMAPS 博客 · 站点级样式补充
+   只做中文排版与品牌细节，不覆盖主题结构 */
+
+/* 中文正文行高与字距，长文可读性 */
+body {
+  line-height: 1.8;
+  letter-spacing: .01em;
+}
+
+.content h1,
+.content h2,
+.content h3 {
+  letter-spacing: 0;
+}
+
+/* 正文表格：中文长表格容易挤，给单元格松一点 */
+.content table th,
+.content table td {
+  padding: .5rem .75rem;
+}
+
+/* 代码块中文注释不要被压行 */
+.content pre code {
+  line-height: 1.6;
+}

@@ -1,0 +1,99 @@
+baseURL = "https://blog.omaps.cn/"
+title = "麦扑科技 OMAPS"
+theme = "roadster"
+
+defaultContentLanguage = "zh-cn"
+locale = "zh-cn"
+hasCJKLanguage = true
+
+enableRobotsTXT = true
+enableGitInfo = false
+
+[pagination]
+  pagerSize = 10
+
+[taxonomies]
+  category = "categories"
+  tag = "tags"
+
+[permalinks]
+  [permalinks.term]
+    tags = "/tags/:slug/"
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    style = "monokai"
+    lineNos = false
+
+[languages]
+  [languages.zh-cn]
+    label = "简体中文"
+    weight = 1
+    title = "麦扑科技 OMAPS"
+    [languages.zh-cn.params]
+      description = "麦扑科技（OMAPS）团队技术博客：点位管理系统、多租户中台、API 治理与工程实践。"
+
+[params]
+  description = "麦扑科技（OMAPS）团队技术博客：点位管理系统、多租户中台、API 治理与工程实践。"
+  copyright = "麦扑科技（OMAPS）"
+  opengraph = true
+  twitter_cards = false
+  readmore = true
+  authorbox = false
+  pager = true
+  post_meta = ["date", "categories"]
+  mainSections = ["post"]
+  # Google Fonts 已在 layouts/_partials/head/gfonts.html 中整体关闭
+  customCSS = ["/css/omaps.css"]
+  dateFormat = "2006-01-02"
+
+  [params.logo]
+    subtitle = "点位管理系统技术博客"
+
+  # 字体与品牌色（官网主色 #ff8000，正文链接受对比度约束取深一档）
+  [params.style.vars]
+    fontFamilyPrimary = '"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif'
+    highlightColor = "#d96f00"
+
+  [params.sidebar]
+    home = "right"
+    list = "right"
+    single = "right"
+    widgets = ["recent", "categories", "taglist"]
+
+  [params.widgets]
+    recent_num = 5
+    tags_counter = false
+
+[[menus.main]]
+  name = "首页"
+  url = "/"
+  weight = 10
+
+[[menus.main]]
+  name = "文章"
+  url = "/post/"
+  weight = 20
+
+[[menus.main]]
+  name = "关于"
+  url = "/about/"
+  weight = 30
+
+[[menus.main]]
+  name = "官网"
+  url = "https://www.omaps.cn"
+  weight = 40
+
+[[menus.footer]]
+  name = "官网 www.omaps.cn"
+  url = "https://www.omaps.cn"
+  weight = 10
+
+[[menus.footer]]
+  name = "GitHub"
+  url = "https://github.com/macula-omaps"
+  weight = 20
