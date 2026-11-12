@@ -102,5 +102,5 @@ theme: landscape
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
   type: git
-  repo: https://github.com/macula-omaps/omaps-blog.git
+  repo: git@github.com:macula-omaps/omaps-blog.git
   branch: gh-pages
