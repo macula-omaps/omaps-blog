@@ -52,6 +52,9 @@ enableGitInfo = false
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 '''
+  # 百度统计：沿用官网 www.omaps.cn 的站点 id（用户决定，两站数据合并统计）。
+  # 留空则不输出任何统计脚本；本地 hugo server 预览也自动不输出。
+  baiduTongjiId = "91d1ed7b8e9f57cc6d6af12e7feed6ed"
   # Google Fonts 已在 layouts/_partials/head/gfonts.html 中整体关闭
   customCSS = ["/css/omaps.css"]
   dateFormat = "2006-01-02"
