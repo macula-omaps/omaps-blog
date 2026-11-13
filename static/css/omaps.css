@@ -24,6 +24,11 @@ body {
   line-height: 1.6;
 }
 
+/* 页面整体宽度：主题默认 1080px，放宽到 1280px（正文与侧栏按原比例伸缩） */
+.container {
+  max-width: 1280px;
+}
+
 /* 目录：随侧栏渲染在「近期文章」上方，阅读时吸附在右侧栏顶部；
    覆盖模板 layouts/_partials/sidebar.html 与 layouts/single.html（主题升级需同步） */
 .widget-toc {
