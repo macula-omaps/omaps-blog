@@ -56,7 +56,8 @@ enableGitInfo = false
   # 留空则不输出任何统计脚本；本地 hugo server 预览也自动不输出。
   baiduTongjiId = "91d1ed7b8e9f57cc6d6af12e7feed6ed"
   # Google Fonts 已在 layouts/_partials/head/gfonts.html 中整体关闭
-  customCSS = ["/css/omaps.css"]
+  # 站点级样式补充；?v=N 用于改样式后强制浏览器刷新缓存（每次改 omaps.css 时递增）
+  customCSS = ["/css/omaps.css?v=2"]
   dateFormat = "2006-01-02"
 
   [params.logo]
