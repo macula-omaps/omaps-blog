@@ -23,3 +23,38 @@ body {
 .content pre code {
   line-height: 1.6;
 }
+
+/* 目录悬浮：宽屏下固定在正文右侧空白区，正文从页首开始读；
+   窄屏（<1480px）右侧没有空间，保持主题默认的文内目录 */
+@media screen and (min-width: 1480px) {
+  .toc {
+    position: fixed;
+    right: max(8px, calc(50% - 540px - 200px));
+    top: 80px;
+    width: 180px;
+    max-height: calc(100vh - 110px);
+    overflow-y: auto;
+    margin-bottom: 0;
+    border-width: 1px;
+    z-index: 30;
+  }
+  .toc__title {
+    padding: 4px 10px;
+    font-size: .8rem;
+  }
+  .toc__menu {
+    font-size: .82rem;
+  }
+  .toc__menu a {
+    padding: 3px 8px;
+  }
+  .toc__menu li li a {
+    padding-left: 20px;
+  }
+  .toc__menu li li li a {
+    padding-left: 32px;
+  }
+  .toc__menu li li li li a {
+    padding-left: 44px;
+  }
+}
