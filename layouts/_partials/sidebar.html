@@ -1,0 +1,39 @@
+{{- $sidebar := false }}
+{{- if eq .Kind "home" -}}
+	{{ $sidebar = (default .Site.Params.sidebar.home .Params.sidebar) }}
+{{- else if eq .Kind "page" -}}
+	{{ $sidebar = (default .Site.Params.sidebar.single .Params.sidebar) }}
+{{- else -}}
+	{{ $sidebar = (default .Site.Params.sidebar.list .Params.sidebar) }}
+{{ end }}
+
+{{- if $sidebar -}}
+<aside class="sidebar{{ if eq $sidebar "left" }} sidebar--left{{ end }}">
+{{- $root := . }}
+{{/* 站点级新增：文章页且开了 toc 时，目录部件置于侧栏最上方（近期文章等之前） */}}
+{{- if and $root.IsPage ($root.Param "toc") (gt (len $root.TableOfContents) 32) }}
+<div class="widget-toc widget">
+	<h4 class="widget__title">{{ T "toc_title" }}</h4>
+	<div class="widget__content widget-toc__menu">
+		{{ $root.TableOfContents }}
+	</div>
+</div>
+{{- end }}
+{{- with (default .Site.Params.sidebar.widgets .Params.widgets) -}}
+	{{- range $widget := . }}
+		{{- $widgetPath := printf "widgets/%s.html" $widget }}
+		{{- $widgetCached := false }}
+		{{- if isset $.Site.Params "widgets" }}
+			{{- $widgetCached = (index $.Site.Params.widgets $widget).cached }}
+		{{- end }}
+		{{- if eq $widgetCached true }}
+			{{- partialCached $widgetPath $root }}
+		{{- else }}
+			{{- partial $widgetPath $root }}
+		{{- end }}
+	{{- end }}
+{{- else }}
+	<p class="sidebar__warning"><strong>{{ T "sidebar_warning" }}:</strong><br>{{ T "sidebar_recommendation" }}</p>
+{{- end }}
+</aside>
+{{- end }}
