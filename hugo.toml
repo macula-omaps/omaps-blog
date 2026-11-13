@@ -60,7 +60,7 @@ enableGitInfo = false
   dateFormat = "2006-01-02"
 
   [params.logo]
-    subtitle = "点位管理系统技术博客"
+    subtitle = "AI 原生研发与工程实践"
 
   # 字体与品牌色（官网主色 #ff8000，正文链接受对比度约束取深一档）
   [params.style.vars]
