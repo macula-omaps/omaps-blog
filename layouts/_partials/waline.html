@@ -42,6 +42,11 @@ fetch(serverURL + '/api/comment?path=' + encodeURIComponent(path) + '&pageSize=1
 			path,
 			pageview: true,
 			lang: 'zh-CN',
+			// 匿名评论：不登录，只要求填昵称；服务端 COMMENT_AUDIT 开启先审后发
+			login: 'disable',
+			meta: ['nick'],
+			requiredMeta: ['nick'],
+			placeholder: '写下你的评论（经审核通过后才会显示）',
 			// emoji 搜索与表情包默认走境外 CDN，按站点规范先关闭
 			emoji: false,
 			search: false,
