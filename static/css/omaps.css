@@ -77,3 +77,24 @@ body {
   font-size: .85rem;
   line-height: 1.5;
 }
+
+/* 评论区（Waline）：配色与字体对齐站内主题，随明暗模式自动切换 */
+.waline-container {
+  --waline-theme-color: #d96f00;
+  --waline-active-color: #f28c1a;
+  --waline-color: var(--color-text);
+  --waline-bg-color: var(--color-surface);
+  --waline-bg-color-light: var(--color-surface-alt);
+  --waline-bg-color-hover: var(--color-surface-alt);
+  --waline-border-color: var(--color-border);
+  --waline-disable-bg-color: var(--color-surface-alt);
+  --waline-bq-color: var(--color-surface-alt);
+  --waline-info-bg-color: var(--color-surface-alt);
+  --waline-info-color: var(--color-text-muted);
+  font-family: inherit;
+}
+
+/* 隐藏「Powered by Waline vX.X.X」标识 */
+.waline-container .wl-footer {
+  display: none;
+}
