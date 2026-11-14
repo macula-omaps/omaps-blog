@@ -5,6 +5,10 @@
 {{- $serverURL := .Site.Params.waline.serverURL -}}
 {{- if $serverURL -}}
 {{- $isPage := eq .Kind "page" -}}
+{{- /* 评论组件 UI 文案跟随页面语言：中文页 zh-CN，其余 en-US（Waline 官方 locale） */ -}}
+{{- $uiLang := cond (eq .Language.Lang "zh-cn") "zh-CN" "en-US" -}}
+{{- /* 占位提示语按语言给两份；en 文案与 COMMENT_AUDIT 先审后发口径一致 */ -}}
+{{- $placeholder := cond (eq .Language.Lang "zh-cn") "写下你的评论（经审核通过后才会显示）" "Leave a comment (shown after moderation)" -}}
 {{- if $isPage -}}
 <link rel="stylesheet" href="{{ "waline/waline.css" | relURL }}">
 {{- end -}}
@@ -42,12 +46,12 @@ fetch(serverURL + '/api/comment?path=' + encodeURIComponent(path) + '&pageSize=1
 			path,
 			// 浏览量统计由上方显式的 pageviewCount() 独立负责；
 			// 这里不能再开 pageview: true，否则评论区会再报一次，刷新一次 +2（2026-11-15 修）
-			lang: 'zh-CN',
+			lang: '{{ $uiLang }}',
 			// 匿名评论：不登录，只要求填昵称；服务端 COMMENT_AUDIT 开启先审后发
 			login: 'disable',
 			meta: ['nick'],
 			requiredMeta: ['nick'],
-			placeholder: '写下你的评论（经审核通过后才会显示）',
+			placeholder: '{{ $placeholder }}',
 			// 隐藏页脚「Powered by Waline」版权条（官方选项；不能用 CSS 藏 wl-footer，那会连编辑器操作栏一起藏掉）
 			noCopyright: true,
 			// emoji 搜索与表情包默认走境外 CDN，按站点规范先关闭
