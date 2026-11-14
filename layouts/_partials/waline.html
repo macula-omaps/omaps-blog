@@ -40,7 +40,8 @@ fetch(serverURL + '/api/comment?path=' + encodeURIComponent(path) + '&pageSize=1
 			el: '#waline',
 			serverURL,
 			path,
-			pageview: true,
+			// 浏览量统计由上方显式的 pageviewCount() 独立负责；
+			// 这里不能再开 pageview: true，否则评论区会再报一次，刷新一次 +2（2026-11-15 修）
 			lang: 'zh-CN',
 			// 匿名评论：不登录，只要求填昵称；服务端 COMMENT_AUDIT 开启先审后发
 			login: 'disable',
