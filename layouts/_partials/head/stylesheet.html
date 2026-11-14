@@ -1,0 +1,11 @@
+{{/* 站点级覆盖主题 head/stylesheet.html：omaps.css 走资源管道自动指纹，改样式不再需要手动 ?v=N 防缓存。
+     主题升级时需对照 themes/roadster 同名文件同步前两段。 */}}
+{{ $style := resources.Get "css/style.css" | resources.ExecuteAsTemplate "css/style.css" . -}}
+<link rel="stylesheet" href="{{ $style.RelPermalink }}">
+{{ $v2Styles := resources.Get "css/v2-styles.css" | resources.ExecuteAsTemplate "css/v2-styles.css" . -}}
+<link rel="stylesheet" href="{{ $v2Styles.RelPermalink }}">
+{{ $omapsCSS := resources.Get "css/omaps.css" | minify | fingerprint -}}
+<link rel="stylesheet" href="{{ $omapsCSS.RelPermalink }}" integrity="{{ $omapsCSS.Data.Integrity }}">
+{{ range .Site.Params.customCSS -}}
+<link rel="stylesheet" href="{{ . | relURL }}">
+{{- end }}
