@@ -1,0 +1,34 @@
+{{- /* Waline 评论 + 浏览量脚本。
+     依赖 hugo.toml [params.waline] serverURL；由 footer.html 在所有页面末尾加载。
+     客户端 JS/CSS 自托管在 static/waline/（禁引境外 CDN）。 */ -}}
+{{- $serverURL := .Site.Params.waline.serverURL -}}
+{{- if $serverURL -}}
+{{- $isPage := eq .Kind "page" -}}
+{{- if $isPage -}}
+<link rel="stylesheet" href="{{ "waline/waline.css" | relURL }}">
+{{- end -}}
+<script type="module">
+import { init, pageviewCount } from '{{ "waline/waline.js" | relURL }}';
+
+const serverURL = '{{ $serverURL }}';
+const path = window.location.pathname;
+
+// 当前页（含列表页摘要）的浏览量回填
+pageviewCount({ serverURL, path });
+
+{{- if $isPage }}
+// 评论组件（仅文章/页面）
+init({
+	el: '#waline',
+	serverURL,
+	path,
+	pageview: true,
+	lang: 'zh-CN',
+	// emoji 搜索与表情包默认走境外 CDN，按站点规范先关闭
+	emoji: false,
+	search: false,
+	reaction: false,
+});
+{{- end }}
+</script>
+{{- end -}}

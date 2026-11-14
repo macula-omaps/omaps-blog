@@ -1,0 +1,1 @@
+<svg class="{{ with .class }}{{ . }}{{ end }}icon icon-pageview" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3C4.8 3 2 5.1.6 8 2 10.9 4.8 13 8 13s6-2.1 7.4-5C14 5.1 11.2 3 8 3zm0 8.2A3.2 3.2 0 1 1 8 4.8a3.2 3.2 0 0 1 0 6.4z"/></svg>

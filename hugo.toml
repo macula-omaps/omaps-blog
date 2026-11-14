@@ -44,7 +44,7 @@ enableGitInfo = false
   readmore = true
   authorbox = false
   pager = true
-  post_meta = ["date", "categories", "wordcount"]
+  post_meta = ["date", "categories", "wordcount", "pageview"]
   mainSections = ["post"]
   # 品牌图标（取自 omaps-web/public，与产品端一致）；favicon.ico 由主题模板引用，
   # SVG / apple-touch-icon 在这里补挂
@@ -62,6 +62,11 @@ enableGitInfo = false
 
   [params.logo]
     subtitle = "AI 原生研发与工程实践"
+
+  # Waline 评论与浏览量（Vercel 部署）。
+  # 客户端 JS/CSS 自托管在 static/waline/；换服务器地址只改这里。
+  [params.waline]
+    serverURL = "https://omaps-blog-qwigbap3t-omaps1.vercel.app"
 
   # 字体与品牌色（官网主色 #ff8000，正文链接受对比度约束取深一档）
   [params.style.vars]

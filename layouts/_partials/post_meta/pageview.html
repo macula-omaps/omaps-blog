@@ -1,0 +1,6 @@
+{{- if .Site.Params.waline.serverURL -}}
+<div class="meta__item-pageview meta__item">
+	{{- partial "svg/pageview.svg" (dict "class" "meta__icon") -}}
+	<span class="meta__text"><span class="waline-pageview-count" data-path="{{ .RelPermalink }}">0</span> 次浏览</span>
+</div>
+{{- end -}}
