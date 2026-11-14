@@ -1,6 +1,7 @@
 {{- /* Waline 评论 + 浏览量脚本。
      依赖 hugo.toml [params.waline] serverURL；由 footer.html 在所有页面末尾加载。
-     客户端 JS/CSS 自托管在 static/waline/（禁引境外 CDN）。 */ -}}
+     客户端 JS/CSS 自托管在 static/waline/（禁引境外 CDN）。
+     服务端不可达时优雅降级：移除评论区与浏览量项，页面回到无评论状态。 */ -}}
 {{- $serverURL := .Site.Params.waline.serverURL -}}
 {{- if $serverURL -}}
 {{- $isPage := eq .Kind "page" -}}
@@ -13,22 +14,41 @@ import { init, pageviewCount } from '{{ "waline/waline.js" | relURL }}';
 const serverURL = '{{ $serverURL }}';
 const path = window.location.pathname;
 
-// 当前页（含列表页摘要）的浏览量回填
-pageviewCount({ serverURL, path });
+// 服务不可达时的降级：撤掉评论区与「N 次浏览」，页面保持干净
+const degrade = () => {
+	document.querySelectorAll('.meta__item-pageview').forEach((el) => el.remove());
+	document.querySelectorAll('.comments').forEach((el) => el.remove());
+};
 
+// 兼容兜底：老浏览器没有 AbortSignal.timeout 时用 AbortController 手动超时
+const timeoutSignal = (ms) => {
+	const c = new AbortController();
+	setTimeout(() => c.abort(), ms);
+	return c.signal;
+};
+
+// 先探测服务可用性（5s 超时），可用才挂组件；不可用则降级
+fetch(serverURL + '/api/comment?path=' + encodeURIComponent(path) + '&pageSize=1&page=1', {
+	signal: timeoutSignal(5000),
+})
+	.then((resp) => {
+		if (!resp.ok) throw new Error('waline server responded ' + resp.status);
+		// 服务正常：先回填浏览量（含列表页摘要），文章页再挂评论组件
+		pageviewCount({ serverURL, path });
 {{- if $isPage }}
-// 评论组件（仅文章/页面）
-init({
-	el: '#waline',
-	serverURL,
-	path,
-	pageview: true,
-	lang: 'zh-CN',
-	// emoji 搜索与表情包默认走境外 CDN，按站点规范先关闭
-	emoji: false,
-	search: false,
-	reaction: false,
-});
+		init({
+			el: '#waline',
+			serverURL,
+			path,
+			pageview: true,
+			lang: 'zh-CN',
+			// emoji 搜索与表情包默认走境外 CDN，按站点规范先关闭
+			emoji: false,
+			search: false,
+			reaction: false,
+		});
 {{- end }}
+	})
+	.catch(degrade);
 </script>
 {{- end -}}
