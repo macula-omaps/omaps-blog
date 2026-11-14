@@ -44,17 +44,19 @@ enableGitInfo = false
     [languages.en.params.logo]
       subtitle = "AI-Native Engineering & Practice"
     [languages.en.menu]
+      # 内部链接必须用 pageRef（Hugo 按当前语言解析页面、自动加 /en/ 前缀）；
+      # url 是原样输出，会指向中文根路径，切到英文后点菜单又跳回中文。
       [[languages.en.menu.main]]
         name = "Home"
-        url = "/"
+        pageRef = "/"
         weight = 10
       [[languages.en.menu.main]]
         name = "Posts"
-        url = "/post/"
+        pageRef = "/post/"
         weight = 20
       [[languages.en.menu.main]]
         name = "About"
-        url = "/about/"
+        pageRef = "/about/"
         weight = 30
       [[languages.en.menu.main]]
         name = "Website"
