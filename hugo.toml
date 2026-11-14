@@ -41,6 +41,8 @@ enableGitInfo = false
     title = "OMAPS Tech Blog"
     [languages.en.params]
       description = "OMAPS team engineering blog: outdoor-advertising spot management, multi-tenant platform, API governance and engineering practice."
+    [languages.en.params.logo]
+      subtitle = "AI-Native Engineering & Practice"
     [languages.en.menu]
       [[languages.en.menu.main]]
         name = "Home"
