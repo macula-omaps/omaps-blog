@@ -4,9 +4,9 @@ description: "Public technical documentation from the OMAPS team and its point-o
 comments: false
 ---
 
-## OMAPS
+## OMAPS Tech
 
-OMAPS focuses on digital management of outdoor advertising placements. Our core product, **OMAPS**, unifies placement (ad space) inventory, customer orders, contracts, and financial documents in a single multi-tenant platform.
+OMAPS Tech focuses on digital management of outdoor advertising placements. Our core product, **OMAPS**, unifies placement (ad space) inventory, customer orders, contracts, and financial documents in a single multi-tenant platform.
 
 Website: [www.omaps.cn](https://www.omaps.cn)
 
