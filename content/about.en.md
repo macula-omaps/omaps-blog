@@ -1,12 +1,12 @@
 ---
 title: "About"
-description: "Public technical documentation from the Macula Technology (OMAPS) team and its point-of-interest management system."
+description: "Public technical documentation from the OMAPS team and its point-of-interest management system."
 comments: false
 ---
 
-## Macula Technology (OMAPS)
+## OMAPS
 
-Macula Technology focuses on digital management of outdoor advertising placements. Our core product, **OMAPS**, unifies placement (ad space) inventory, customer orders, contracts, and financial documents in a single multi-tenant platform.
+OMAPS focuses on digital management of outdoor advertising placements. Our core product, **OMAPS**, unifies placement (ad space) inventory, customer orders, contracts, and financial documents in a single multi-tenant platform.
 
 Website: [www.omaps.cn](https://www.omaps.cn)
 
