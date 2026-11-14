@@ -44,7 +44,7 @@ enableGitInfo = false
   readmore = true
   authorbox = false
   pager = true
-  post_meta = ["date", "categories"]
+  post_meta = ["date", "categories", "wordcount"]
   mainSections = ["post"]
   # 品牌图标（取自 omaps-web/public，与产品端一致）；favicon.ico 由主题模板引用，
   # SVG / apple-touch-icon 在这里补挂
