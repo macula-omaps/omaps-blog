@@ -30,11 +30,42 @@ enableGitInfo = false
 
 [languages]
   [languages.zh-cn]
-    label = "简体中文"
+    label = "中文"
     weight = 1
     title = "麦扑科技 OMAPS"
     [languages.zh-cn.params]
       description = "麦扑科技（OMAPS）团队技术博客：点位管理系统、多租户中台、API 治理与工程实践。"
+  [languages.en]
+    label = "English"
+    weight = 2
+    title = "OMAPS Tech Blog"
+    [languages.en.params]
+      description = "OMAPS team engineering blog: outdoor-advertising spot management, multi-tenant platform, API governance and engineering practice."
+    [languages.en.menu]
+      [[languages.en.menu.main]]
+        name = "Home"
+        url = "/"
+        weight = 10
+      [[languages.en.menu.main]]
+        name = "Posts"
+        url = "/post/"
+        weight = 20
+      [[languages.en.menu.main]]
+        name = "About"
+        url = "/about/"
+        weight = 30
+      [[languages.en.menu.main]]
+        name = "Website"
+        url = "https://www.omaps.cn"
+        weight = 40
+      [[languages.en.menu.footer]]
+        name = "Website www.omaps.cn"
+        url = "https://www.omaps.cn"
+        weight = 10
+      [[languages.en.menu.footer]]
+        name = "GitHub"
+        url = "https://github.com/macula-omaps"
+        weight = 20
 
 [params]
   description = "麦扑科技（OMAPS）团队技术博客：点位管理系统、多租户中台、API 治理与工程实践。"
@@ -105,6 +136,10 @@ enableGitInfo = false
   url = "https://www.omaps.cn"
   weight = 40
 
+
+
+
+
 [[menus.footer]]
   name = "官网 www.omaps.cn"
   url = "https://www.omaps.cn"
@@ -114,3 +149,5 @@ enableGitInfo = false
   name = "GitHub"
   url = "https://github.com/macula-omaps"
   weight = 20
+
+

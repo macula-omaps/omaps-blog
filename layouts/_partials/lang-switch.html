@@ -1,0 +1,24 @@
+{{/*
+  语言切换按钮：渲染在 header 右侧。
+  - 当前页面存在另一语言翻译时，互链到对应翻译页（.AllTranslations）
+  - 缺翻译时回落到对方语言的站点首页
+  - 当前语言高亮，不做死链接
+*/}}
+{{- if hugo.IsMultilingual }}
+{{- $cur := . }}
+{{- range hugo.Sites }}
+{{- $lang := .Language.Lang }}
+{{- $target := .Home }}
+{{- if eq $lang $cur.Language.Lang }}
+{{- $target = $cur }}
+{{- else }}
+{{- range $cur.AllTranslations }}
+{{- if eq .Language.Lang $lang }}{{ $target = . }}{{ end }}
+{{- end }}
+{{- end }}
+<a class="lang-switch__item{{ if eq $lang $cur.Language.Lang }} lang-switch__item--active{{ end }}"
+   href="{{ $target.RelPermalink }}"
+   hreflang="{{ $lang }}"
+   {{- if not (eq $lang $cur.Language.Lang) }} rel="alternate"{{- end }}>{{ .Language.Label }}</a>
+{{- end }}
+{{- end }}

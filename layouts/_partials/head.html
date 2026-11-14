@@ -6,6 +6,13 @@
 
 {{- partial "head/seo.html" . -}}
 
+{{- /* 站级追加：双语互链 hreflang，仅多语言且有翻译输出时生效 */ -}}
+{{- if hugo.IsMultilingual }}
+{{- range .AllTranslations }}
+<link rel="alternate" hreflang="{{ .Language.Lang }}" href="{{ .Permalink }}">
+{{- end }}
+{{- end }}
+
 {{- partial "head/gfonts.html" . -}}
 
 {{- partial "head/stylesheet.html" . -}}

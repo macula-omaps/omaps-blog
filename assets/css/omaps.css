@@ -93,3 +93,34 @@ body {
   --waline-info-color: var(--color-text-muted);
   font-family: inherit;
 }
+
+/* 语言切换：菜单条末尾的 中/EN 按钮，随明暗主题自动切换 */
+.lang-switch {
+  display: flex;
+}
+
+.lang-switch__item {
+  display: block;
+  padding: 10px 15px;
+  padding: .625rem .9375rem;
+  font-weight: 700;
+  color: var(--color-inverse-text);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.lang-switch__item:hover {
+  color: var(--color-inverse-text);
+}
+
+.lang-switch__item--active {
+  color: var(--color-meta-icon);
+  cursor: default;
+}
+
+@media screen and (min-width: 767px) {
+  .menu__item--lang {
+    margin-left: auto;
+    border-left: 1px solid var(--color-menu-border);
+  }
+}
