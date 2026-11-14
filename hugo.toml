@@ -63,10 +63,10 @@ enableGitInfo = false
   [params.logo]
     subtitle = "AI 原生研发与工程实践"
 
-  # Waline 评论与浏览量（Vercel 部署）。
-  # 客户端 JS/CSS 自托管在 static/waline/；换服务器地址只改这里。
+  # Waline 评论与浏览量（自托管于公司服务器 waline.omaps.cn，nginx 反代 omaps-waline 容器）。
+  # 客户端 JS/CSS 自托管在 static/waline/；服务端部署与运维见 omaps-deploy 仓库 docs/waline.md。
   [params.waline]
-    serverURL = "https://omaps-blog-qwigbap3t-omaps1.vercel.app"
+    serverURL = "https://waline.omaps.cn"
 
   # 字体与品牌色（官网主色 #ff8000，正文链接受对比度约束取深一档）
   [params.style.vars]
