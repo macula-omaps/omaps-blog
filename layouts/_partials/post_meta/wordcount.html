@@ -1,6 +1,10 @@
 {{- if .WordCount -}}
 <div class="meta__item-wordcount meta__item">
 	{{- partial "svg/wordcount.svg" (dict "class" "meta__icon") -}}
+	{{- if eq .Language.Lang "zh-cn" -}}
 	<span class="meta__text">共 {{ .WordCount }} 字 · 阅读约 {{ math.Max 1 .ReadingTime }} 分钟</span>
+	{{- else -}}
+	<span class="meta__text">{{ .WordCount }} words · ~{{ math.Max 1 .ReadingTime }} min read</span>
+	{{- end -}}
 </div>
 {{- end -}}
