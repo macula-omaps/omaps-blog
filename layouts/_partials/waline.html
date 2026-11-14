@@ -47,6 +47,8 @@ fetch(serverURL + '/api/comment?path=' + encodeURIComponent(path) + '&pageSize=1
 			meta: ['nick'],
 			requiredMeta: ['nick'],
 			placeholder: '写下你的评论（经审核通过后才会显示）',
+			// 隐藏页脚「Powered by Waline」版权条（官方选项；不能用 CSS 藏 wl-footer，那会连编辑器操作栏一起藏掉）
+			noCopyright: true,
 			// emoji 搜索与表情包默认走境外 CDN，按站点规范先关闭
 			emoji: false,
 			search: false,

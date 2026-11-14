@@ -93,8 +93,3 @@ body {
   --waline-info-color: var(--color-text-muted);
   font-family: inherit;
 }
-
-/* 隐藏「Powered by Waline vX.X.X」标识 */
-.waline-container .wl-footer {
-  display: none;
-}
