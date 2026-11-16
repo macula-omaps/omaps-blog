@@ -12,7 +12,7 @@ tags:
 toc: true
 ---
 
-> This post distills the API governance methodology developed for the OMAPS (麦扑科技) location management system: a risk catalog of 17 control measures for enterprise internal systems, designed for architecture reviews, security requirement writing, and threat modeling.
+> This post distills the API governance methodology developed for the OMAPS (麦朴科技) location management system: a risk catalog of 17 control measures for enterprise internal systems, designed for architecture reviews, security requirement writing, and threat modeling.
 >
 > Scope: **enterprise internal systems** — systems where the data is a company-level asset and every user is both a user and a maintainer of that asset. This includes CQRS command channels / multi-tenant middle platforms / open APIs (MCP, mini-program mobile clients).
 > Purpose: a standard risk catalog for architecture reviews, security requirements, and threat modeling.
