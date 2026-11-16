@@ -23,4 +23,4 @@ comments: false
 ## 联系
 
 - 官网：[www.omaps.cn](https://www.omaps.cn)
-- GitHub：[github.com/macula-omaps](https://github.com/macula-omaps)
+- GitHub：[github.com/xomaps](https://github.com/xomaps)

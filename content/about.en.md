@@ -23,4 +23,4 @@ Posts come from internal team documents, published after sanitization: no client
 ## Contact
 
 - Website: [www.omaps.cn](https://www.omaps.cn)
-- GitHub: [github.com/macula-omaps](https://github.com/macula-omaps)
+- GitHub: [github.com/xomaps](https://github.com/xomaps)

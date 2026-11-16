@@ -32,7 +32,7 @@ hugo server -D                        # 本地预览 http://localhost:1313
 ## 域名
 
 - `static/CNAME` = `blog.omaps.cn`，构建时复制进产物。
-- DNS 需一条 `CNAME blog → macula-omaps.github.io`。
+- DNS 需一条 `CNAME blog → xomaps.github.io`。
 - GitHub 仓库 Settings → Pages：Source 选 `gh-pages` 分支 / root，Custom domain 填 `blog.omaps.cn`，勾选 Enforce HTTPS。
 
 ## 依赖
