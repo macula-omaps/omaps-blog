@@ -1,6 +1,6 @@
 # blog.omaps.cn
 
-麦朴科技（OMAPS）技术博客。Hugo + Roadster 主题，GitHub Pages 托管，自定义域名 `blog.omaps.cn`。
+麦朴科技（XOMAPS）技术博客。Hugo + Roadster 主题，GitHub Pages 托管，自定义域名 `blog.omaps.cn`。
 
 ## 结构
 

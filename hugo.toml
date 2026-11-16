@@ -1,5 +1,5 @@
 baseURL = "https://blog.omaps.cn/"
-title = "麦朴科技 OMAPS"
+title = "麦朴科技 XOMAPS"
 theme = "roadster"
 
 defaultContentLanguage = "zh-cn"
@@ -32,15 +32,15 @@ enableGitInfo = false
   [languages.zh-cn]
     label = "中文"
     weight = 1
-    title = "麦朴科技 OMAPS"
+    title = "麦朴科技 XOMAPS"
     [languages.zh-cn.params]
-      description = "麦朴科技（OMAPS）团队技术博客：点位管理系统、多租户中台、API 治理与工程实践。"
+      description = "麦朴科技（XOMAPS）团队技术博客：点位管理系统、多租户中台、API 治理与工程实践。"
   [languages.en]
     label = "English"
     weight = 2
-    title = "OMAPS Tech Blog"
+    title = "XOMAPS Tech Blog"
     [languages.en.params]
-      description = "OMAPS team engineering blog: outdoor-advertising spot management, multi-tenant platform, API governance and engineering practice."
+      description = "XOMAPS team engineering blog: outdoor-advertising spot management, multi-tenant platform, API governance and engineering practice."
     [languages.en.params.logo]
       subtitle = "AI-Native Engineering & Practice"
     [languages.en.menu]
@@ -72,8 +72,8 @@ enableGitInfo = false
         weight = 20
 
 [params]
-  description = "麦朴科技（OMAPS）团队技术博客：点位管理系统、多租户中台、API 治理与工程实践。"
-  copyright = "麦朴科技（OMAPS）"
+  description = "麦朴科技（XOMAPS）团队技术博客：点位管理系统、多租户中台、API 治理与工程实践。"
+  copyright = "麦朴科技（XOMAPS）"
   opengraph = true
   twitter_cards = false
   readmore = true
