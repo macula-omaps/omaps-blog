@@ -1,0 +1,11 @@
+{
+  // Cloudflare Workers 配置：部署 Hugo 构建产物（public/）为静态资源站点
+  // 部署命令：npx wrangler deploy（需先 wrangler login 或设置 CLOUDFLARE_API_TOKEN）
+  "name": "blog",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./public",
+    // Hugo 生成的 404.html 作为未匹配路径的响应
+    "not_found_handling": "404-page"
+  }
+}
