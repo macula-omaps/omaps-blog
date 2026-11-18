@@ -83,7 +83,7 @@ enableGitInfo = false
   mainSections = ["post"]
   # 目录站级默认开启；侧栏模板对无标题文章有保护（TableOfContents 长度 > 32 才渲染）
   toc = true
-  # 品牌图标（取自 omaps-web/public，与产品端一致）；favicon.ico 由主题模板引用，
+  # 品牌图标（取自 xomaps-web/public，与产品端一致）；favicon.ico 由主题模板引用，
   # SVG / apple-touch-icon 在这里补挂
   CustomHeadHTML = '''
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -93,7 +93,7 @@ enableGitInfo = false
   # 留空则不输出任何统计脚本；本地 hugo server 预览也自动不输出。
   baiduTongjiId = "91d1ed7b8e9f57cc6d6af12e7feed6ed"
   # Google Fonts 已在 layouts/_partials/head/gfonts.html 中整体关闭
-  # 站点级样式补充；?v=N 用于改样式后强制浏览器刷新缓存（每次改 omaps.css 时递增）
+  # 站点级样式补充；?v=N 用于改样式后强制浏览器刷新缓存（每次改 xomaps.css 时递增）
   customCSS = []
   dateFormat = "2006-01-02"
 

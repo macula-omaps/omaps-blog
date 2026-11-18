@@ -155,7 +155,7 @@ This catalog is a **business-layer refinement** of the OWASP API Top 10 2023: OW
 - **Definition**: Endpoint authorization is fine, but input parameters control whether sensitive fields are returned (`showMobile=true`, `rawData=true`) and yield plaintext. This is "can access the resource, but should not see all attributes".
 - **Typical entry points**: Open APIs, MCP/AI egress, export endpoints, log egress.
 - **Controls**: Masking happens uniformly at the server-side egress; never trust any front-end "already hidden" assumption; switch-style masking parameters forbidden; the AI channel's single egress masks by field name uniformly.
-- **⚠️ Implementation in this project**: `ResponseMasker` masks mobile numbers/bank accounts/ID numbers/passwords by field name at the single `BackendClient` egress (`omaps.mcp.mask-sensitive` on by default).
+- **⚠️ Implementation in this project**: `ResponseMasker` masks mobile numbers/bank accounts/ID numbers/passwords by field name at the single `BackendClient` egress (`xomaps.mcp.mask-sensitive` on by default).
 
 ### 1.4 Precondition Bypass
 
