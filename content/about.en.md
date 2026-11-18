@@ -4,9 +4,9 @@ description: "Public technical documentation from the Xomaps team and its point-
 comments: false
 ---
 
-## Xomaps Tech
+## Xomaps® Tech
 
-Xomaps Tech focuses on digital management of outdoor advertising placements. Our core product, **Xomaps**, unifies placement (ad space) inventory, customer orders, contracts, and financial documents in a single multi-tenant platform.
+Xomaps Tech focuses on digital management of outdoor advertising placements. Our core product, **Xomaps®**, unifies placement (ad space) inventory, customer orders, contracts, and financial documents in a single multi-tenant platform.
 
 Website: [www.omaps.cn](https://www.omaps.cn)
 
