@@ -13,3 +13,6 @@ Thumbs.db
 # 本地 agent 记忆
 .workbuddy/
 wechat/
+# 本地构建缓存
+.wrangler/
+.DS_Store
