@@ -14,7 +14,7 @@ toc: true
 
 > This post distills the API governance methodology developed for the Xomaps® (信朴科技) location management system: a risk catalog of 17 control measures for enterprise internal systems, designed for architecture reviews, security requirement writing, and threat modeling.
 >
-> Scope: **enterprise internal systems** — systems where the data is a company-level asset and every user is both a user and a maintainer of that asset. This includes CQRS command channels / multi-tenant middle platforms / open APIs (MCP, mini-program mobile clients).
+> Scope: **enterprise internal systems** — systems where the data is a company-level asset and every user is both a user and a maintainer of that asset. This includes command channels (consolidated command layer on the write side) / multi-tenant middle platforms / open APIs (MCP, mini-program mobile clients).
 > Purpose: a standard risk catalog for architecture reviews, security requirements, and threat modeling.
 > Positioning: belongs to the "API Access and Integrity Risk" category, alongside Transport Security and Authentication Security.
 
@@ -79,7 +79,7 @@ When threat modeling, ask one question first: **is this request "no rights", "en
 
 ## 0.5 Mapping to the OWASP API Security Top 10 (2023)
 
-This catalog is a **business-layer refinement** of the OWASP API Top 10 2023: OWASP's three authorization categories (API1/API3/API5) are split here into finer-grained items that can go straight into acceptance criteria; CQRS command channels, multi-tenant references, and context injection are shapes OWASP does not call out separately but that occur frequently in middle-platform architectures.
+This catalog is a **business-layer refinement** of the OWASP API Top 10 2023: OWASP's three authorization categories (API1/API3/API5) are split here into finer-grained items that can go straight into acceptance criteria; command channels (write-side consolidation), multi-tenant references, and context injection are shapes OWASP does not call out separately but that occur frequently in middle-platform architectures.
 
 | This catalog | OWASP API Top 10 2023 | Notes |
 |---|---|---|
@@ -87,7 +87,7 @@ This catalog is a **business-layer refinement** of the OWASP API Top 10 2023: OW
 | R3 horizontal bypass, R4 bulk/export bypass, R5 transitive bypass, R6 cross-tenant reference injection | **API1:2023** Broken Object Level Authorization | Object-level authorization failure (BOLA/IDOR), top of OWASP's list |
 | R7 field-level bypass, R8 masking bypass | **API3:2023** Broken Object Property Level Authorization | 2019's Mass Assignment and Excessive Data Exposure were merged into one item in 2023: write-side field whitelisting and read-side field reduction are two faces of the same root cause |
 | R9 state gate bypass, R10 version bypass, R13 business combination constraint bypass | No direct counterpart | Belongs to the OWASP Business Logic Cheat Sheet domain; a single API item does not cover business invariants |
-| R11 CQRS channel bypass, R12 replay bypass | No direct counterpart | Specific to CQRS/Event Sourcing architectures; command idempotency and projection idempotency are mature industry capabilities (see R12) |
+| R11 command channel bypass, R12 replay bypass | No direct counterpart | Specific to CQRS/Event Sourcing architectures; command idempotency and projection idempotency are mature industry capabilities (see R12) |
 | R14 permission context injection, R15 proxy relay bypass | Root-cause shapes of API1/API5 | Context assembly errors also involve API8:2023 Security Misconfiguration |
 | R16 query-side bypass | Read-side shape of API1:2023 | Under CQRS, separating command/query gates is the authoritative recommendation (commands strict, queries broader but gated) |
 | R17 business quota bypass | **API4:2023** + **API6:2023** | API4 = unrestricted resource consumption (technical impact); API6 = unrestricted access to sensitive business flows (business impact). The two are often conflated into a single "rate limiting" problem — see R17 |
@@ -145,10 +145,10 @@ This catalog is a **business-layer refinement** of the OWASP API Top 10 2023: OW
 
 #### R7. Field-Level Authorization Bypass (Attribute Write Bypass)
 - **Definition**: The user is allowed to update the document, but certain sensitive fields should be off-limits; the endpoint has no "writable field whitelist", so PATCH/POST overwrites the whole object.
-- **Typical entry points**: Whole-object update save endpoints, bulk field mapping (BeanUtils full-copy), CQRS command applyFields.
+- **Typical entry points**: Whole-object update save endpoints, bulk field mapping (BeanUtils full-copy), command-layer handler applyFields.
 - **Controls**: Explicit per-field assignment (BeanUtils full-copy forbidden); protected fields structurally eliminated at the DTO layer; unified write-path interception: clears `tenantId` on create, backfills `tenantId/createBy/createTime` on update; business ownership fields (e.g. salesId) declared as a protected list by the Service.
 - **Deserialization defense** (OWASP's standard countermeasure for Mass Assignment): deserialization configured to **reject unknown properties** (`FAIL_ON_UNKNOWN_PROPERTIES`) — undefined fields smuggled in the request body fail loudly instead of being silently dropped, otherwise field smuggling is only half-blocked; payload size caps; hard caps on nesting depth (usually ≤3 levels).
-- **⚠️ Implementation in this project**: `BaseRestController#save` is wired with `ProtectedFields`; CQRS handlers assign fields one by one in applyFields; field smuggling is covered by contract-test watchdogs.
+- **⚠️ Implementation in this project**: `BaseRestController#save` is wired with `ProtectedFields`; command-layer handlers assign fields one by one in applyFields; field smuggling is covered by contract-test watchdogs.
 - **Further reading**: [OWASP API3:2023 Broken Object Property Level Authorization](https://owasp.org/API-Security/editions/2023/en/0xa3-broken-object-property-level-authorization/) (same root cause as R8)
 
 #### R8. Data Masking Bypass (Attribute Read Bypass)
@@ -175,7 +175,10 @@ This catalog is a **business-layer refinement** of the OWASP API Top 10 2023: OW
 
 ### 1.5 Command and Message Channels
 
-#### R11. CQRS Command Channel Authorization Bypass
+#### R11. Command Channel Authorization Bypass
+
+> Terminology note: the command channel in this project is **CQS (Command Query Separation) applied at architecture level** — write endpoints are consolidated into Command Handlers while reads use the regular query model, with no separate read store; CQRS/Event Sourcing architectures take this shape further, where the same risk patterns apply and are even more typical.
+
 - **Definition**: Command forgery, missing command authorization, broken gating on async command paths (annotations not resolved along the inheritance chain, whitelist omissions, handlers not wired to gates).
 - **Typical entry points**: `POST /commands/{action}` endpoints, command handlers, async command consumers.
 - **Controls**: One endpoint per command + `@Valid`; handlers uniformly pass four gates (dedup fingerprint → data-scope gate → execute → doExecute); if annotations don't resolve along the inheritance chain, every subclass must be annotated explicitly; even with wildcard URL authorization coverage, integration testing must verify.
@@ -183,7 +186,7 @@ This catalog is a **business-layer refinement** of the OWASP API Top 10 2023: OW
 
 #### R12. Idempotency / Replay Bypass
 - **Definition**: Commands and update endpoints lack replay protection; a captured legitimate request is re-delivered repeatedly, causing duplicate orders, duplicate approvals, duplicate charges. Even with authorization, ownership, state, and combination constraints all correct, the business is still broken.
-- **Typical entry points**: Payment/transfer write endpoints, async CQRS message replay, dead-letter retries, MQ duplicate delivery.
+- **Typical entry points**: Payment/transfer write endpoints, async command message replay, dead-letter retries, MQ duplicate delivery.
 - **Controls**: Creates use a dedup fingerprint for idempotency; deletes made idempotent; business actions carry a unique business-number idempotency key; async consumers dedupe by message ID; retry semantics defined explicitly (at-least-once must be paired with idempotency).
 - **Engineering details (the three invisible seams where idempotency breaks)**:
   1. **The idempotency marker and the business result must land in the same transaction**. Write the event first, then mark "processed" in a separate transaction — crash between the two commits, and the retry sees no marker, so the same command runs again (duplicate charges). The industry-standard practice is to put "save event + mark command processed" into one database transaction.
@@ -241,7 +244,7 @@ This catalog is a **business-layer refinement** of the OWASP API Top 10 2023: OW
 | 1 | Vertical authorization bypass | Is this subject allowed to call this endpoint |
 | 2 | Horizontal authorization bypass (IDOR) | Is this subject allowed to touch this record |
 | 3 | State gate bypass | Does the current state allow this action |
-| 4 | CQRS command channel bypass | Is every gate on the command path in place |
+| 4 | command channel bypass | Is every gate on the command path in place |
 | 5 | Business combination constraint bypass | Are the field combinations valid together |
 | 6 | Field-level authorization bypass | Is he allowed to write this field |
 | 7 | Bulk/export scope bypass | Do lists, exports, and statistics have row-level filtering |
@@ -255,7 +258,7 @@ This catalog is a **business-layer refinement** of the OWASP API Top 10 2023: OW
 - **Data ownership**: R3 horizontal bypass, R4 bulk/export bypass, R6 cross-tenant reference injection, R5 transitive/associated resource bypass
 - **Attribute granularity**: R7 field write bypass, R8 masking bypass
 - **Precondition bypass**: R9 state gates, R10 version lock bypass
-- **Command and message channels**: R11 CQRS command bypass, R12 replay bypass
+- **Command and message channels**: R11 command bypass, R12 replay bypass
 - **Business invariants**: R13 business combination constraint bypass
 - **Context class**: R14 permission parameter injection, R15 proxy relay bypass
 - **Query and quota**: R16 query bypass, R17 business quota bypass
