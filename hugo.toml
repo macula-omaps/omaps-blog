@@ -1,5 +1,5 @@
 baseURL = "https://blog.omaps.cn/"
-title = "麦朴科技 XOMAPS"
+title = "麦朴科技 Xomaps"
 theme = "roadster"
 
 defaultContentLanguage = "zh-cn"
@@ -32,15 +32,15 @@ enableGitInfo = false
   [languages.zh-cn]
     label = "中文"
     weight = 1
-    title = "麦朴科技 XOMAPS"
+    title = "麦朴科技 Xomaps"
     [languages.zh-cn.params]
-      description = "麦朴科技（XOMAPS）团队技术博客：点位管理系统、多租户中台、API 治理与工程实践。"
+      description = "麦朴科技（Xomaps）团队技术博客：点位管理系统、多租户中台、API 治理与工程实践。"
   [languages.en]
     label = "English"
     weight = 2
-    title = "XOMAPS Tech Blog"
+    title = "Xomaps Tech Blog"
     [languages.en.params]
-      description = "XOMAPS team engineering blog: outdoor-advertising spot management, multi-tenant platform, API governance and engineering practice."
+      description = "Xomaps team engineering blog: outdoor-advertising spot management, multi-tenant platform, API governance and engineering practice."
     [languages.en.params.logo]
       subtitle = "AI-Native Engineering & Practice"
     [languages.en.menu]
@@ -72,8 +72,8 @@ enableGitInfo = false
         weight = 20
 
 [params]
-  description = "麦朴科技（XOMAPS）团队技术博客：点位管理系统、多租户中台、API 治理与工程实践。"
-  copyright = "麦朴科技（XOMAPS）"
+  description = "麦朴科技（Xomaps）团队技术博客：点位管理系统、多租户中台、API 治理与工程实践。"
+  copyright = "麦朴科技（Xomaps）"
   opengraph = true
   twitter_cards = false
   readmore = true
@@ -100,10 +100,11 @@ enableGitInfo = false
   [params.logo]
     subtitle = "AI 原生研发与工程实践"
 
-  # Waline 评论与浏览量（自托管于公司服务器 waline.omaps.cn，nginx 反代 omaps-waline 容器）。
-  # 客户端 JS/CSS 自托管在 static/waline/；服务端部署与运维见 omaps-deploy 仓库 docs/waline.md。
+  # Waline 评论与浏览量。后端已迁 Cloudflare Workers + D1（社区实现 Waline_On_Worker，
+  # 源码在本地 xomaps/waline-on-worker，部署 npx wrangler deploy），不再依赖公司服务器容器。
+  # 客户端 JS/CSS 仍自托管在 static/waline/（禁引境外 CDN）。
   [params.waline]
-    serverURL = "https://waline.omaps.cn"
+    serverURL = "https://waline.jokeway.workers.dev"
 
   # 字体与品牌色（官网主色 #ff8000，正文链接受对比度约束取深一档）
   [params.style.vars]

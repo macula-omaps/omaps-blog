@@ -1,12 +1,12 @@
 ---
 title: "About"
-description: "Public technical documentation from the XOMAPS team and its point-of-interest management system."
+description: "Public technical documentation from the Xomaps team and its point-of-interest management system."
 comments: false
 ---
 
-## XOMAPS Tech
+## Xomaps Tech
 
-XOMAPS Tech focuses on digital management of outdoor advertising placements. Our core product, **XOMAPS**, unifies placement (ad space) inventory, customer orders, contracts, and financial documents in a single multi-tenant platform.
+Xomaps Tech focuses on digital management of outdoor advertising placements. Our core product, **Xomaps**, unifies placement (ad space) inventory, customer orders, contracts, and financial documents in a single multi-tenant platform.
 
 Website: [www.omaps.cn](https://www.omaps.cn)
 
