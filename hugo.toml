@@ -146,9 +146,14 @@ enableGitInfo = false
 
 
 [[menus.footer]]
-  name = "官网 www.omaps.cn"
-  url = "https://www.omaps.cn"
+  name = "公司官网 www.xomaps.com"
+  url = "https://www.xomaps.com"
   weight = 10
+
+[[menus.footer]]
+  name = "项目官网 www.omaps.cn"
+  url = "https://www.omaps.cn"
+  weight = 15
 
 [[menus.footer]]
   name = "GitHub"
