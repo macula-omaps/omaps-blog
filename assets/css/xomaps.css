@@ -141,3 +141,20 @@ body {
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
+
+/* 上角标标引：可点击锚点，样式保持弱化不抢正文 */
+.content sup {
+  cursor: pointer;
+}
+.content sup a {
+  color: inherit;
+  text-decoration: none;
+}
+.content sup a:hover {
+  color: var(--primary, #ff8000);
+}
+
+/* 参考文献：让标引回跳有落点、外链可辨识 */
+.content ol li[id^="ref-"] {
+  scroll-margin-top: 2rem;
+}

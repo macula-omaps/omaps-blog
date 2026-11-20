@@ -33,3 +33,7 @@
 
 {{- /* 站级覆盖：在原主题 head.html 末尾追加访问统计（百度统计） */ -}}
 {{- partial "analytics.html" . -}}
+
+{{- /* 站级追加：引用增强（上角标锚点定位参考文献 + 参考文献外链 _blank） */ -}}
+{{- $xomapsJS := resources.Get "js/xomaps.js" | minify | fingerprint -}}
+<script src="{{ $xomapsJS.RelPermalink }}" defer></script>

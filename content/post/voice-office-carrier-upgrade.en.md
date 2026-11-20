@@ -1,6 +1,6 @@
 ---
 title: "From Text to Voice: The Carrier Upgrade of Office Information and AI's Full-Picture Understanding"
-date: 2026-11-20T11:30:00+08:00
+date: 2026-11-20T11:40:00+08:00
 description: "LLMs are built on text, and text is only one layer in the history of knowledge carriers. Keyboard-bound offices switch off the sound of work, so AI never sees the full picture; every step of the 'voice becomes context' chain has a prototype — from Memex in 1945 to the 2025 pendant wave — and the whisper-filled office showed up in 2026."
 categories:
   - AI-Native Engineering
@@ -141,7 +141,7 @@ As for whether the office still needs to be quiet — based on the whisper-fille
 
 1. Digital Preservation (Library of Congress): Computing Pioneer Gordon Bell Visits Library — Bell on the audio channel and MyLifeBits. https://www.digitalpreservation.gov/news/2010/20100519news_article_gordon_bell.html
 2. Otter.ai — AI Notetaker capabilities and the MCP Server interface. https://otter.ai
-3.尧图网络: AI meeting-minutes tools dissected — transcription accuracy and structured output of four mainstream apps (Feishu Minutes, Tongyi Tingwu, speaker-separation field tests). https://kwkr.cn/news/352190
+3. 尧图网络: AI meeting-minutes tools dissected — transcription accuracy and structured output of four mainstream apps (Feishu Minutes, Tongyi Tingwu, speaker-separation field tests). https://kwkr.cn/news/352190
 4. Wikipedia: As We May Think — Vannevar Bush's 1945 Memex concept. https://en.wikipedia.org/wiki/As_We_May_Think
 5. Recording Law: Wearable Recording Devices at Work, A Complete Legal Guide — Amazon's acquisition of Bee, Plaud's user base, the thirteen consent states, Bee's inverted indicator. http://recordinglaw.com/wearable-recording-devices-at-work
 6. Themata.AI: The hottest AI wearables and gadgets you should know about — the full 2025 wearable-capture lineup. https://themata.ai/stories/the-hottest-ai-wearables-and-gadgets-you-should-know-about--eff79b0c-3bdf-43f4-8633-db90c1056554
