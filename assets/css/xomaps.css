@@ -1,6 +1,35 @@
 /* 信朴科技 XOMAPS 博客 · 站点级样式补充
    只做中文排版与品牌细节，不覆盖主题结构 */
 
+/* Outfit 变量字体（100-900）：仅英文版使用（hugo.toml -> languages.en.params.style.vars），
+   文件自托管 static/fonts/，不走境外 CDN。@font-face 全站声明无害——中文页面字体栈
+   不含 Outfit，浏览器不会下载这两个文件。 */
+@font-face {
+  font-family: "Outfit";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/outfit-variable-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Outfit";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/outfit-variable-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* 英文版字体：Outfit（whois.domaintools.com 同款，Google Fonts 几何无衬线体）。
+   主题把主字体挂在 body 选择器上，且 css/style.css 为两语言共享资源
+   （hugo.toml 的 languages.en.params.style.vars 覆盖在共享资源管道下不生效，实测确认），
+   所以用 html[lang="en"] 按语言作用域覆盖，中文版不受影响。 */
+html[lang="en"] body {
+  font-family: "Outfit", "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
 /* 中文正文行高与字距，长文可读性 */
 body {
   line-height: 1.8;
