@@ -133,3 +133,11 @@ body {
 .logo__link {
   margin: 0 auto;
 }
+
+/* 被引内容下划线：淡色虚线，弱于正文、不抢文字 */
+.content u {
+  text-decoration: underline dashed;
+  text-decoration-color: rgba(120, 140, 165, .35);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}

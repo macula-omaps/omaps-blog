@@ -20,7 +20,7 @@ toc: true
 
 ## 背景：UI 消失之后，所有 API 直达
 
-**核心命题**：AI 正在把企业系统的消费方式从「人 + UI」变成「agent + API/CLI」。界面不再是必经之路——agent 直接枚举接口、读工具描述、按语义自主组合调用。**过去默认由 UI 层承担的全部防护职责同时失效**，这就是本清单存在的理由。
+**核心命题**：AI 正在把企业系统的消费方式从「人 + UI」变成「agent + API/CLI」。界面不再是必经之路——agent 直接枚举接口、读工具描述、按语义自主组合调用。**过去默认由 UI 层承担的全部防护职责同时失效**，<u>这就是本清单存在的理由</u><sup>[1][2]</sup>。
 
 | 维度 | UI 时代（人 + 图形界面） | AI 时代（agent + API/CLI） |
 |---|---|---|
@@ -36,7 +36,6 @@ toc: true
 2. **接口通道自身多出 AI 特有攻击面**：工具描述投毒、rug pull（批准后换定义）、每次重试广播完整上下文（含 PII 与凭证）——见 §4.2，与本清单 17 项**叠加**而非替代。
 3. **CLI/API 化本身是正确方向，前提是后端闸补位**。可审计（命令是文本、可完整留痕）、可沙盒、可限权，正是 API 通道优于 GUI 黑盒之处；缺的不是接口形式，而是**把 UI 曾经默认提供的前置校验全部下沉为服务端闸**——这正是本清单 17 项控制措施的共同主题。
 
-> 延伸阅读：[Agent 工具调用正在把 UI 变成攻击面（Feross / Terence Eden 观点综述）](https://www.botlearn.com.cn/en/community/ai_general/b7e2f280-b9ec-4872-b202-d37b18808799/agent-%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E6%AD%A3%E5%9C%A8%E6%8A%8A-ui-%E5%8F%98%E6%88%90%E6%94%BB%E5%87%BB%E9%9D%A2)、[MCP Server 攻击面分析（模型决策 + 上下文污染 + 工具权限 + 链式调用）](https://zone.ci/secarticles/wx/570239.html)
 
 ### 为什么企业内部系统坍塌得最彻底
 
@@ -79,7 +78,7 @@ AI 时代，这个控制结构整个坍塌。坍塌发生在三个层面：
 
 ## 0.5 与 OWASP API Security Top 10 (2023) 的映射
 
-本清单是 OWASP API Top 10 2023 的**业务层细化**：OWASP 的三大授权类（API1/API3/API5）在本清单里被拆成粒度更细、可直接入验收的条目；命令通道（写侧收口）、多租户引用、上下文注入等属于 OWASP 没有单列、但中台架构里高发的形态。
+本清单是 OWASP API Top 10 2023 的**业务层细化**：OWASP 的三大授权类（API1/API3/API5）在本清单里被拆成粒度更细、可直接入验收的条目；命令通道（写侧收口）、多租户引用、上下文注入等属于 OWASP 没有单列、<u>但中台架构里高发的形态</u><sup>[3]</sup>。
 
 | 本清单 | OWASP API Top 10 2023 | 说明 |
 |---|---|---|
@@ -108,20 +107,18 @@ AI 时代，这个控制结构整个坍塌。坍塌发生在三个层面：
 
 #### R2. 动作混淆越权（弱语义动作绕过）
 - **定义**：一个接口承载多个动作，或动作类型由入参控制（如统一 `operate(type)`，`type=submit/approve/revoke`）；只校验"能否访问接口"，不校验"能否执行该动作"。
-- **典型入口**：统一操作端点、状态机驱动接口、MCP 工具分发层。
+- **典型入口**：统一操作端点、状态机驱动接口、<u>MCP 工具分发层</u>。<sup>[4]</sup>
 - **控制措施**：每个动作独立端点 + 独立权限；动作粒度鉴权（接口通过 ≠ 动作放行）；动作枚举白名单。
 - **与 R1 区分**：R1 是平台/租户面的权限层级，R2 是动作粒度的鉴权缺失。
-- **延伸阅读**：[OWASP API5:2023 Broken Function Level Authorization](https://owasp.org/API-Security/editions/2023/en/0xa5-broken-function-level-authorization/)
 
 ### 1.2 数据归属越权
 
 #### R3. 水平越权（IDOR / 资源归属越权）
-- **定义**：绕过数据归属、数据域隔离，按 ID 直接访问/操作他人资源。
+- **定义**：绕过数据归属、数据域隔离，<u>按 ID 直接访问/操作他人资源</u><sup>[5]</sup>。
 - **典型入口**：`GET /{id}`、`POST /{id}/xxx`、任何按 ID 取对象的端点。
 - **控制措施**：按 ID 读必须过租户闸与数据域闸；列表与详情口径成对（列表限了详情不限＝口径分裂）。
 - **⚠️ 本项目实锤**：`findById` **不受 Hibernate filter**（`em.find` 不走查询计划）——读闸必须由 `TenantEntityListener#postLoad` 兜底；数据域闸 `ScopeReadable#assertReadable` 须接在 `BaseRestController#getOne/delete` 边界。
 - **⚠️ 子资源同样要闸**：按父 ID 查子列表的路由（`/by-customer`、`/{id}/records`）必须先对父对象 `assertReadable`。
-- **延伸阅读**：[OWASP API1:2023 Broken Object Level Authorization](https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/)
 
 #### R4. 批量 / 列表类隐式越权（范围越权）
 - **定义**：单条资源校验做了，但批量查询、导出、统计、聚合接口没有行级过滤；单条拿不走，却能拉全租户/全平台数据。
@@ -144,12 +141,11 @@ AI 时代，这个控制结构整个坍塌。坍塌发生在三个层面：
 ### 1.3 属性粒度越权
 
 #### R7. 字段级越权（属性写越权）
-- **定义**：允许用户更新这条单据，但某些敏感字段不允许他碰；接口没有"可写字段白名单"，PATCH/POST 直接整体覆盖。
+- **定义**：允许用户更新这条单据，但某些敏感字段不允许他碰；接口没有"可写字段白名单"，<u>PATCH/POST 直接整体覆盖</u><sup>[6]</sup>。
 - **典型入口**：整对象更新的 save 端点、批量字段映射（BeanUtils 整拷）、命令层 Handler 的 applyFields。
 - **控制措施**：逐字段显式赋值（禁 BeanUtils 整拷）；受保护字段在 DTO 层结构性消灭；写入口统一拦截：新增清 `tenantId`、更新回填 `tenantId/createBy/createTime`；业务归属字段（如 salesId）由 Service 声明保护清单。
-- **反序列化防线**（OWASP 对 Mass Assignment 的标准对策）：反序列化配置**拒绝未知属性**（`FAIL_ON_UNKNOWN_PROPERTIES`）——请求体里夹带的未定义字段直接报错而不是静默丢弃，否则字段夹带只被挡一半；载荷大小上限；嵌套深度硬上限（通常 ≤3 层）。
+- **反序列化防线**（OWASP 对 Mass Assignment 的标准对策）：反序列化配置**拒绝未知属性**（`FAIL_ON_UNKNOWN_PROPERTIES`）——请求体里夹带的未定义字段直接报错而不是静默丢弃，否则字段夹带只被挡一半；载荷大小上限；<u>嵌套深度硬上限（通常 ≤3 层）</u><sup>[7]</sup>。
 - **⚠️ 本项目落点**：`BaseRestController#save` 已接 `ProtectedFields`；命令层 Handler 的 applyFields 逐字段赋值；字段夹带由契约测试看门狗覆盖。
-- **延伸阅读**：[OWASP API3:2023 Broken Object Property Level Authorization](https://owasp.org/API-Security/editions/2023/en/0xa3-broken-object-property-level-authorization/)（R8 同源）
 
 #### R8. 数据脱敏绕过（属性读越权）
 - **定义**：接口鉴权没问题，但可通过入参控制是否返回敏感字段（`showMobile=true`、`rawData=true`）拿到明文。属于"能访问资源，但不该看到全部属性"。
@@ -167,11 +163,10 @@ AI 时代，这个控制结构整个坍塌。坍塌发生在三个层面：
 - **⚠️ AI 攻击特征**：AI 不会走前端页面，会直接 POST `/save`——凡是绕过 `save()` 的 `/save` 端点都是它的第一落点。
 
 #### R10. 版本 / 快照绕过（乐观锁绕过）
-- **定义**：实体有版本锁、乐观锁，但后端未强制校验版本；拿旧版本快照构造请求覆盖后续变更，绕过中间状态校验（如单据已被他人审核，拿旧版本号提交更新覆盖审核结果）。
+- **定义**：实体有版本锁、乐观锁，但后端未强制校验版本；拿旧版本快照构造请求覆盖后续变更，绕过中间状态校验（如单据已被他人审核，<u>拿旧版本号提交更新覆盖审核结果</u>）<sup>[8]</sup>。
 - **典型入口**：带 version 字段的更新接口、并发编辑场景、移动端离线回传。
 - **控制措施**：更新必须带 version 且后端强制比对；乐观锁失败显式报错（不是静默覆盖）；**数据库层兜底约束**——对（聚合 ID, 版本号）建唯一索引（`UNIQUE(aggregate_id, version)`），应用层漏判时写入直接失败，这是不可绕过的最后防线；关键单据叠加"锁定 + 红冲"机制兜底。
 - **与 R9 区分**：R9 管状态机前置条件，R10 管时间线上的覆盖。
-- **延伸阅读**：[CQRS 幂等与乐观锁工程实现](https://dev.to/ohugonnot/idempotency-in-cqrs-and-event-sourcing-part-2-commands-projections-and-outbox-4ei)（R12 同源）
 
 ### 1.5 命令与消息通道
 
@@ -197,12 +192,11 @@ AI 时代，这个控制结构整个坍塌。坍塌发生在三个层面：
 ### 1.6 业务不变量
 
 #### R13. 业务组合约束绕过（Business Invariant Bypass）
-- **定义**：有权操作、状态合法，但变更后字段组合违反联动规则、值域互斥（金额为负、起止日期倒挂、比例之和超 100%）。
+- **定义**：有权操作、状态合法，但变更后字段组合违反联动规则、值域互斥（金额为负、起止日期倒挂、<u>比例之和超 100%</u>）<sup>[9]</sup>。
 - **典型入口**：任何写接口的入参校验层，尤其金额、比例、日期、枚举互斥字段。
 - **控制措施**：金额入参一律 `signum() > 0` 强校验；组合规则在 Handler/Service 层显式断言，不依赖前端；状态字段命名避开保留字。
 - **⚠️ 本项目实锤**（渗透 S18）：`/allocate` 收 `-1000/0/-99999` 全 200，`paid_amount` 变负后余额公式 `应付-已付` 反被放大，应付 3000 划出 50000。
 - **与 R7 区分**：R7 管"这个主体有没有资格碰这个字段"，R13 管"字段之间合不合法"。
-- **延伸阅读**：[OWASP Business Logic Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Business_Logic_Security_Cheat_Sheet.html)（R9/R10 同源）
 
 ### 1.7 上下文类
 
@@ -229,11 +223,10 @@ AI 时代，这个控制结构整个坍塌。坍塌发生在三个层面：
 - **典型入口**：创建类端点、文件上传、AI token 消耗、存储/流量。
 - **控制措施**：配额校验在服务端（数量、大小、频率分层）；防超卖只认条件原子 UPDATE（先查后改必超卖）；AI 消耗逐轮记账防双记；超限软拒绝并留痕。
 - **API4 与 API6 的区分（OWASP 2023 新增之二，别混成一个"限流"问题）**：
-  - **API4 资源消耗**：纯技术影响（DoS、成本膨胀），对策是通用限流、分页上限、载荷上限——网关层可统一做。
-  - **API6 敏感业务流**：业务影响（黄牛扫货、占座锁库存、薅返利），**每个请求都合法**，扫描器测不出来；对策必须按业务流逐个选：该业务维度（而非全局 IP）的限额、人机验证、行为分析、设备指纹。**业务先选流，工程再选闸**——不可能每个端点都上挑战。
-  - **机器消费接口（B2B / 开放 API / AI 通道）是重灾区**：它们天然过不了浏览器挑战，OWASP 明确点名"此类接口常缺少等价防护而成为易打目标"——必须用客户端身份 + 契约级配额 + 用途限制 + 审计留痕补齐等价防护。
+  - **API4 资源消耗**：纯技术影响（DoS、成本膨胀），对策是通用限流、分页上限、载荷上限——<u>网关层可统一做</u>。<sup>[10]</sup>
+  - **API6 敏感业务流**：业务影响（黄牛扫货、占座锁库存、薅返利），**每个请求都合法**，扫描器测不出来；对策必须按业务流逐个选：该业务维度（而非全局 IP）的限额、人机验证、行为分析、设备指纹。**业务先选流，工程再选闸**——<u>不可能每个端点都上挑战</u>。<sup>[11]</sup>
+  - **机器消费接口（B2B / 开放 API / AI 通道）是重灾区**：它们天然过不了浏览器挑战，OWASP 明确点名"此类接口常缺少等价防护而成为易打目标"——必须用客户端身份 + 契约级配额 + 用途限制 + <u>审计留痕补齐等价防护</u><sup>[12]</sup>。
 - **⚠️ 本项目落点**：存储 10 GiB / 流量 200 GiB，改额度三处同改；AI token 按 `ModelCallEndEvent` 逐轮记账＋`perRoundMetered` 防双记；MCP 会话预算（次数/字节窗口累计）。
-- **延伸阅读**：[OWASP API4:2023 Unrestricted Resource Consumption](https://owasp.org/API-Security/editions/2023/en/0xa4-unrestricted-resource-consumption/)、[OWASP API6:2023 敏感业务流](https://owasp.org/API-Security/editions/2023/en/0xa6-unrestricted-access-to-sensitive-business-flows/)、[机器消费接口等价防护](https://ammune.ai/blog/owasp-api6-2023-unrestricted-access-to-sensitive-business-flows)
 
 ---
 
@@ -279,14 +272,14 @@ AI 与人工渗透的行为差异决定了重点防线：
 
 ### 4.2 Agentic AI 的增量攻击面（2025-2026 共识）
 
-AI 通道从"批量 curl"进化到"自主 agent"后，本清单多个风险会**复合爆发**。行业参照系：OWASP LLM Top 10 2025（LLM06 Excessive Agency）、OWASP Agentic AI Top 10（2025-12 发布）、Gartner 预测（到 2029 年，对 AI agent 的成功攻击 **>50% 打的是访问控制**，提示注入只是投递手段）；五眼联盟网络机构 2026-04 首份 agentic AI 联合指南同样把**权限**列为头号风险类。
+AI 通道从"批量 curl"进化到"自主 agent"后，本清单多个风险会**复合爆发**。行业参照系：<u>OWASP LLM Top 10 2025（LLM06 Excessive Agency）</u><sup>[13]</sup>、<u>OWASP Agentic AI Top 10（2025-12 发布）</u><sup>[14]</sup>、Gartner 预测（到 2029 年，对 AI agent 的成功攻击 **>50% 打的是访问控制**，<u>提示注入只是投递手段</u>）<sup>[15]</sup>；五眼联盟网络机构 2026-04 首份 agentic AI 联合指南同样把**权限**列为头号风险类。
 
 **MCP 通道的具体载荷（背景命题的实例化）**：
 
-- **工具描述即攻击载体**：agent 每次连接都全量枚举工具并阅读描述（人类只读一次文档），描述直接进入模型上下文并参与调用决策——Tool Poisoning（描述/参数 schema 藏指令）、Rug Pull（批准后换定义）、Tool Shadowing（污染可信工具的用法说明）。AMA 论文实证：仅操纵工具元数据（名称/描述/参数模式）即可在黑盒下诱导 agent 优先调用恶意工具，成功率 **81%–95%**。
+- **工具描述即攻击载体**：agent 每次连接都全量枚举工具并阅读描述（人类只读一次文档），描述直接进入模型上下文并参与调用决策——Tool Poisoning（描述/参数 schema 藏指令）、Rug Pull（批准后换定义）、Tool Shadowing（污染可信工具的用法说明）。AMA 论文实证：仅操纵工具元数据（名称/描述/参数模式）即可在黑盒下诱导 agent 优先调用恶意工具，<u>成功率 **81%–95%**</u><sup>[16]</sup>。
 - **传统漏洞照旧直达**：MCP Server 本身就是联网服务——模型调得动，任何连得到端点的人也调得动；认证缺失、IDOR、命令注入在 MCP 出现前就存在，现在多了一层「模型会照文字填参数」的放大器（实证案例：官方参考实现 postgres server 把只读事务包着的查询原样透传，`COMMIT;` 前缀即可逃逸只读约束执行 DDL）。
 - **重试即外泄**：agent 重试失败指令时会把完整对话历史（含先前工具返回的 PII、凭证）重新走一遍网络——每次重试都是一次数据外带机会。
-- **对策落点**：Kaspersky 九条可归纳为本清单语言的四件事——agent/MCP 资产清单与白名单（对应 R2 动作枚举）、最小权限与任务期有效（对应 R1/R15）、高危操作人工审批（人在环）、提示词/工具调用/终端命令/网络流量全量进 SIEM（对应 R12 审计面）。
+- **对策落点**：Kaspersky 九条可归纳为本清单语言的四件事——agent/MCP 资产清单与白名单（对应 R2 动作枚举）、最小权限与任务期有效（对应 R1/R15）、高危操作人工审批（人在环）、提示词/工具调用/终端命令/网络流量全量进 SIEM（<u>对应 R12 审计面</u>）<sup>[17]</sup>。
 
 | 失效模式 | 对应本清单 | 说明 |
 |---|---|---|
@@ -302,26 +295,30 @@ AI 通道从"批量 curl"进化到"自主 agent"后，本清单多个风险会**
 2. **agent 是一等身份**：自己的凭证、自己的审计轨迹、自己的行为基线，治理强度对齐人类账号；禁止"一个 bot 一张神卡"。
 3. **身份永不取自提示词或工具参数**："当前用户是 xxx"作为 prompt 变量或 tool 参数传入＝可被注入篡改（对应 R14）。身份必须从认证态透传到每一次工具调用和下游跳转。
 4. **每次调用授权动作本身，不只授权会话**：会话开始校验一次、之后 agent 用自己的凭证随意调＝混淆代理的标准温床。
-5. **MCP / 代理层注意 audience 校验**：业界把"MCP 服务器盲目转发客户端 token 到下游"列为反模式（审计记错调用者、audience 控制被绕过）；正确形态是显式 on-behalf-of + 调用者身份快照 + fail-closed——本项目 MCP 透传设计（`McpCaller` bearerToken 快照、空则拒绝、401 不重试）与此一致，补强方向是下游接口校验 token audience（RFC 8707 resource indicator）。
+5. **MCP / 代理层注意 audience 校验**：业界把"MCP 服务器盲目转发客户端 token 到下游"列为反模式（审计记错调用者、audience 控制被绕过）；正确形态是显式 on-behalf-of + 调用者身份快照 + fail-closed——本项目 MCP 透传设计（`McpCaller` bearerToken 快照、空则拒绝、401 不重试）与此一致，补强方向是下游接口校验 token audience（<u>RFC 8707 resource indicator</u>）<sup>[18]</sup>。
 6. **高危动作人在环**：审批确认不能送到 agent 可写回的同一通道里（确认被 agent 转述＝确认形同虚设）。
 
-**延伸阅读**：[OWASP LLM Top 10 2025](https://genai.owasp.org/llm-top-10/)、[OWASP Agentic AI 资源（2025-12 Agentic Top 10）](https://genai.owasp.org/)、[Gartner 访问控制预测解读](https://www.safeguard.sh/resources/blog/agentic-ai-access-control-problem)、[Confused Deputy 治理清单（NHI Group）](https://nhimg.org/confused-deputy-in-ai-agents-guide)
 
 ---
 
-## 5. 参考资料
+## 5. 参考文献
 
-- OWASP API Security Top 10 (2023)：https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/ （API1–API10 各条同域）
-- OWASP Developer Guide · API Top Ten：https://devguide.owasp.org/en/07-training-education/07-api-top-ten/
-- CQRS 命令幂等与乐观锁工程实现（幂等键同事务落库、`UNIQUE(aggregate_id, version)`）：https://dev.to/ohugonnot/idempotency-in-cqrs-and-event-sourcing-part-2-commands-projections-and-outbox-4ei
-- CQRS 三层命令验证与严格反序列化（拒绝未知属性、载荷上限）：https://www.jcwlyf.com/content-51211.html
-- OWASP API6 敏感业务流（业务层/工程层双层对策）：https://owasp.org/API-Security/editions/2023/en/0xa6-unrestricted-access-to-sensitive-business-flows/
-- 机器消费接口（B2B/AI 通道）的等价防护：https://ammune.ai/blog/owasp-api6-2023-unrestricted-access-to-sensitive-business-flows
-- [OWASP LLM Top 10 2025](https://genai.owasp.org/llm-top-10/)（LLM06 Excessive Agency）与 [OWASP GenAI / Agentic AI Top 10](https://genai.owasp.org/)（2025-12）
-- Gartner：到 2029 年 >50% 的 AI agent 攻击利用访问控制缺陷——https://www.safeguard.sh/resources/blog/agentic-ai-access-control-problem
-- 非人类身份 · Confused Deputy 治理清单（MCP token audience、身份透传反模式）：https://nhimg.org/confused-deputy-in-ai-agents-guide
-- EchoLeak（CVE-2025-32711）、ForcedLeak（Salesforce Agentforce）、Replit 删库事件——agentic 攻击公开案例
-- Agent 工具调用把 UI 变成攻击面（Feross / Terence Eden 观点综述：攻击面从「用户点了什么」扩展到「agent 决定调什么」）：https://www.botlearn.com.cn/en/community/ai_general/b7e2f280-b9ec-4872-b202-d37b18808799/agent-工具调用正在把-ui-变成攻击面
-- MCP Server 攻击面识别（模型决策、上下文污染、工具权限、链式调用；OWASP MCP Top 10 映射）：https://zone.ci/secarticles/wx/570239.html
-- 工具投毒实证：操纵工具元数据诱导调用恶意工具（AMA 论文，成功率 81%–95%）：https://www.freebuf.com/articles/ai-security/495691.html
-- 企业 AI 代理防范九项措施（Kaspersky：资产清单、白名单、最小权限、人工审批、隔离、SIEM/XDR）：https://cpunews.net/claude-code-cli等ai代理成新攻击面：企业防范ai代理攻击的9项措施
+1. Agent 工具调用把 UI 变成攻击面（Feross / Terence Eden 观点综述：攻击面从「用户点了什么」扩展到「agent 决定调什么」）. https://www.botlearn.com.cn/en/community/ai_general/b7e2f280-b9ec-4872-b202-d37b18808799/agent-工具调用正在把-ui-变成攻击面
+2. MCP Server 攻击面识别（模型决策、上下文污染、工具权限、链式调用；OWASP MCP Top 10 映射）. https://zone.ci/secarticles/wx/570239.html
+3. OWASP Developer Guide · API Top Ten. https://devguide.owasp.org/en/07-training-education/07-api-top-ten/
+4. OWASP API5:2023 Broken Function Level Authorization. https://owasp.org/API-Security/editions/2023/en/0xa5-broken-function-level-authorization/
+5. OWASP API1:2023 Broken Object Level Authorization. https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/
+6. OWASP API3:2023 Broken Object Property Level Authorization. https://owasp.org/API-Security/editions/2023/en/0xa3-broken-object-property-level-authorization/
+7. CQRS 三层命令验证与严格反序列化（拒绝未知属性、载荷上限）. https://www.jcwlyf.com/content-51211.html
+8. CQRS 命令幂等与乐观锁工程实现（幂等键同事务落库、`UNIQUE(aggregate_id, version)`；R12 同源）. https://dev.to/ohugonnot/idempotency-in-cqrs-and-event-sourcing-part-2-commands-projections-and-outbox-4ei
+9. OWASP Business Logic Security Cheat Sheet（R9/R10 同源）. https://cheatsheetseries.owasp.org/cheatsheets/Business_Logic_Security_Cheat_Sheet.html
+10. OWASP API4:2023 Unrestricted Resource Consumption. https://owasp.org/API-Security/editions/2023/en/0xa4-unrestricted-resource-consumption/
+11. OWASP API6:2023 Unrestricted Access to Sensitive Business Flows（业务层/工程层双层对策）. https://owasp.org/API-Security/editions/2023/en/0xa6-unrestricted-access-to-sensitive-business-flows/
+12. 机器消费接口（B2B / 开放 API / AI 通道）的等价防护. https://ammune.ai/blog/owasp-api6-2023-unrestricted-access-to-sensitive-business-flows
+13. OWASP LLM Top 10 2025（LLM06 Excessive Agency）. https://genai.owasp.org/llm-top-10/
+14. OWASP GenAI / Agentic AI Top 10（2025-12 发布）. https://genai.owasp.org/
+15. Gartner 预测解读：到 2029 年 >50% 的 AI agent 攻击利用访问控制缺陷. https://www.safeguard.sh/resources/blog/agentic-ai-access-control-problem
+16. 工具投毒实证：操纵工具元数据诱导调用恶意工具（AMA 论文，成功率 81%–95%）. https://www.freebuf.com/articles/ai-security/495691.html
+17. 企业 AI 代理防范九项措施（Kaspersky：资产清单、白名单、最小权限、人工审批、隔离、SIEM/XDR）. https://cpunews.net/claude-code-cli等ai代理成新攻击面：企业防范ai代理攻击的9项措施
+18. 非人类身份 · Confused Deputy 治理清单（MCP token audience、身份透传反模式）. https://nhimg.org/confused-deputy-in-ai-agents-guide
+19. 公开案例：EchoLeak（CVE-2025-32711）、ForcedLeak（Salesforce Agentforce）、Replit 删库事件（无单一权威链接，按 CVE 编号与事件名检索）

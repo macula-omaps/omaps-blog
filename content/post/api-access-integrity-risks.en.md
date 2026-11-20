@@ -20,7 +20,7 @@ toc: true
 
 ## Background: Once the UI Disappears, Every API Is Directly Reachable
 
-**Core thesis**: AI is changing how enterprise systems are consumed, from "human + UI" to "agent + API/CLI". The interface is no longer the mandatory path — agents enumerate endpoints directly, read tool descriptions, and chain calls autonomously based on semantics. **Every protection the UI layer silently provided now fails at once**. That is why this catalog exists.
+**Core thesis**: AI is changing how enterprise systems are consumed, from "human + UI" to "agent + API/CLI". The interface is no longer the mandatory path — agents enumerate endpoints directly, read tool descriptions, and chain calls autonomously based on semantics. **Every protection the UI layer silently provided now fails at once**. <u>That is why this catalog exists</u><sup>[1][2]</sup>.
 
 | Dimension | UI era (human + GUI) | AI era (agent + API/CLI) |
 |---|---|---|
@@ -36,7 +36,6 @@ Three corollaries frame everything that follows:
 2. **The API channel itself adds AI-specific attack surfaces**: tool description poisoning, rug pulls (swapping a tool's definition after approval), and broadcasting full context (including PII and credentials) on every retry — see §4.2. These **stack on top of** the 17 items, not replace them.
 3. **CLI/API-first is the right direction, provided backend gates fill in**. It is auditable (commands are text and fully traceable), sandboxable, and permission-scoped — that is precisely where the API channel beats the GUI black box. What's missing is not the interface form, but **pushing every front-check the UI once provided by default down into server-side gates** — which is the shared theme of the 17 control measures in this catalog.
 
-> Further reading: [Agent tool calls are turning the UI into an attack surface (survey of Feross / Terence Eden's points)](https://www.botlearn.com.cn/en/community/ai_general/b7e2f280-b9ec-4872-b202-d37b18808799/agent-%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E6%AD%A3%E5%9C%A8%E6%8A%8A-ui-%E5%8F%98%E6%88%90%E6%94%BB%E5%87%BB%E9%9D%A2), [MCP Server attack surface analysis (model decisions + context pollution + tool permissions + chained calls)](https://zone.ci/secarticles/wx/570239.html)
 
 ### Why Enterprise Internal Systems Collapse the Most Completely
 
@@ -79,7 +78,7 @@ When threat modeling, ask one question first: **is this request "no rights", "en
 
 ## 0.5 Mapping to the OWASP API Security Top 10 (2023)
 
-This catalog is a **business-layer refinement** of the OWASP API Top 10 2023: OWASP's three authorization categories (API1/API3/API5) are split here into finer-grained items that can go straight into acceptance criteria; command channels (write-side consolidation), multi-tenant references, and context injection are shapes OWASP does not call out separately but that occur frequently in middle-platform architectures.
+This catalog is a **business-layer refinement** of the OWASP API Top 10 2023: OWASP's three authorization categories (API1/API3/API5) are split here into finer-grained items that can go straight into acceptance criteria; command channels (write-side consolidation), multi-tenant references, and context injection are shapes OWASP does not call out separately but that <u>occur frequently in middle-platform architectures</u><sup>[3]</sup>.
 
 | This catalog | OWASP API Top 10 2023 | Notes |
 |---|---|---|
@@ -108,20 +107,18 @@ This catalog is a **business-layer refinement** of the OWASP API Top 10 2023: OW
 
 #### R2. Action Confusion Bypass (Weak-Semantics Action Bypass)
 - **Definition**: One endpoint carries multiple actions, or the action type is controlled by an input parameter (e.g. a unified `operate(type)` with `type=submit/approve/revoke`); only "can this endpoint be accessed" is checked, not "can this action be executed".
-- **Typical entry points**: Unified operation endpoints, state-machine-driven endpoints, MCP tool dispatch layers.
+- **Typical entry points**: Unified operation endpoints, state-machine-driven endpoints, <u>MCP tool dispatch layers</u>.<sup>[4]</sup>
 - **Controls**: One endpoint + one permission per action; action-granularity authorization (endpoint access ≠ action approval); action enumeration whitelists.
 - **Distinction from R1**: R1 is permission hierarchy on the platform/tenant surface; R2 is missing authorization at action granularity.
-- **Further reading**: [OWASP API5:2023 Broken Function Level Authorization](https://owasp.org/API-Security/editions/2023/en/0xa5-broken-function-level-authorization/)
 
 ### 1.2 Data Ownership Bypass
 
 #### R3. Horizontal Authorization Bypass (IDOR / Resource Ownership)
-- **Definition**: Skipping data-ownership and data-scope isolation, directly accessing or operating on another user's resources by ID.
+- **Definition**: Skipping data-ownership and data-scope isolation, directly accessing or <u>operating on another user's resources by ID</u><sup>[5]</sup>.
 - **Typical entry points**: `GET /{id}`, `POST /{id}/xxx`, any endpoint that fetches an object by ID.
 - **Controls**: Reads by ID must pass the tenant gate and the data-scope gate; list and detail policies come in pairs (list filtered but detail not = policy split).
 - **⚠️ Confirmed in this project**: `findById` **does not go through Hibernate filters** (`em.find` bypasses the query plan) — the read gate must be backstopped by `TenantEntityListener#postLoad`; the data-scope gate `ScopeReadable#assertReadable` must be wired at the `BaseRestController#getOne/delete` boundary.
 - **⚠️ Sub-resources need gates too**: routes that list children by parent ID (`/by-customer`, `/{id}/records`) must call `assertReadable` on the parent first.
-- **Further reading**: [OWASP API1:2023 Broken Object Level Authorization](https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/)
 
 #### R4. Implicit Bulk / List Authorization Bypass (Scope Bypass)
 - **Definition**: Single-resource checks are in place, but bulk query, export, statistics, and aggregation endpoints lack row-level filtering; you can't take one record, but you can pull an entire tenant's or the entire platform's data.
@@ -144,12 +141,11 @@ This catalog is a **business-layer refinement** of the OWASP API Top 10 2023: OW
 ### 1.3 Attribute-Granularity Bypass
 
 #### R7. Field-Level Authorization Bypass (Attribute Write Bypass)
-- **Definition**: The user is allowed to update the document, but certain sensitive fields should be off-limits; the endpoint has no "writable field whitelist", so PATCH/POST overwrites the whole object.
+- **Definition**: The user is allowed to update the document, but certain sensitive fields should be off-limits; the endpoint has no "writable field whitelist", so <u>PATCH/POST overwrites the whole object</u><sup>[6]</sup>.
 - **Typical entry points**: Whole-object update save endpoints, bulk field mapping (BeanUtils full-copy), command-layer handler applyFields.
 - **Controls**: Explicit per-field assignment (BeanUtils full-copy forbidden); protected fields structurally eliminated at the DTO layer; unified write-path interception: clears `tenantId` on create, backfills `tenantId/createBy/createTime` on update; business ownership fields (e.g. salesId) declared as a protected list by the Service.
-- **Deserialization defense** (OWASP's standard countermeasure for Mass Assignment): deserialization configured to **reject unknown properties** (`FAIL_ON_UNKNOWN_PROPERTIES`) — undefined fields smuggled in the request body fail loudly instead of being silently dropped, otherwise field smuggling is only half-blocked; payload size caps; hard caps on nesting depth (usually ≤3 levels).
+- **Deserialization defense** (OWASP's standard countermeasure for Mass Assignment): deserialization configured to **reject unknown properties** (`FAIL_ON_UNKNOWN_PROPERTIES`) — undefined fields smuggled in the request body fail loudly instead of being silently dropped, otherwise field smuggling is only half-blocked; payload size caps; <u>hard caps on nesting depth (usually ≤3 levels)</u><sup>[7]</sup>.
 - **⚠️ Implementation in this project**: `BaseRestController#save` is wired with `ProtectedFields`; command-layer handlers assign fields one by one in applyFields; field smuggling is covered by contract-test watchdogs.
-- **Further reading**: [OWASP API3:2023 Broken Object Property Level Authorization](https://owasp.org/API-Security/editions/2023/en/0xa3-broken-object-property-level-authorization/) (same root cause as R8)
 
 #### R8. Data Masking Bypass (Attribute Read Bypass)
 - **Definition**: Endpoint authorization is fine, but input parameters control whether sensitive fields are returned (`showMobile=true`, `rawData=true`) and yield plaintext. This is "can access the resource, but should not see all attributes".
@@ -167,11 +163,10 @@ This catalog is a **business-layer refinement** of the OWASP API Top 10 2023: OW
 - **⚠️ AI attack signature**: AI never walks the front-end pages; it POSTs `/save` directly — any `/save` endpoint that bypasses `save()` is its first landing spot.
 
 #### R10. Version / Snapshot Bypass (Optimistic Locking Bypass)
-- **Definition**: The entity has version locking / optimistic locking, but the backend never enforces version checks; an old-version snapshot is used to construct a request that overwrites later changes and skips intermediate state validation (e.g. the document was already approved by someone else; submitting an update with the old version number overwrites the approval result).
+- **Definition**: The entity has version locking / optimistic locking, but the backend never enforces version checks; an old-version snapshot is used to construct a request that overwrites later changes and skips intermediate state validation (e.g. the document was already approved by someone else; submitting an update with the old version number <u>overwrites the approval result</u>)<sup>[8]</sup>.
 - **Typical entry points**: Update endpoints with a version field, concurrent editing, mobile offline sync.
 - **Controls**: Updates must carry a version and the backend must enforce the comparison; optimistic-lock failures fail loudly (never silently overwrite); **database-level backstop constraint** — a unique index on (aggregate ID, version) (`UNIQUE(aggregate_id, version)`), so writes fail outright when the application layer misses the check; this is the un-bypassable last line of defense; critical documents additionally get a "lock + reversal" mechanism as a backstop.
 - **Distinction from R9**: R9 governs state-machine preconditions; R10 governs overwrites on the timeline.
-- **Further reading**: [Engineering idempotency and optimistic locking in CQRS](https://dev.to/ohugonnot/idempotency-in-cqrs-and-event-sourcing-part-2-commands-projections-and-outbox-4ei) (same root cause as R12)
 
 ### 1.5 Command and Message Channels
 
@@ -197,12 +192,11 @@ This catalog is a **business-layer refinement** of the OWASP API Top 10 2023: OW
 ### 1.6 Business Invariants
 
 #### R13. Business Combination Constraint Bypass
-- **Definition**: The actor has rights and the state is legal, but the change violates cross-field linkage rules or value-domain exclusivity (negative amounts, inverted start/end dates, percentages summing over 100%).
+- **Definition**: The actor has rights and the state is legal, but the change violates cross-field linkage rules or value-domain exclusivity (negative amounts, inverted start/end dates, <u>percentages summing over 100%</u>)<sup>[9]</sup>.
 - **Typical entry points**: Input validation layers of any write endpoint, especially amounts, percentages, dates, and mutually exclusive enums.
 - **Controls**: Amount inputs strictly validated with `signum() > 0`; combination rules asserted explicitly at the Handler/Service layer, never delegated to the front end; state field naming avoids reserved words.
 - **⚠️ Confirmed in this project** (penetration test S18): `/allocate` returned 200 for `-1000/0/-99999`; once `paid_amount` went negative, the balance formula `payable - paid` amplified instead, and RMB 50,000 was allocated against a payable of RMB 3,000.
 - **Distinction from R7**: R7 governs "is this subject allowed to touch this field"; R13 governs "are the fields valid together".
-- **Further reading**: [OWASP Business Logic Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Business_Logic_Security_Cheat_Sheet.html) (same root cause as R9/R10)
 
 ### 1.7 Context-Class Risks
 
@@ -229,11 +223,10 @@ This catalog is a **business-layer refinement** of the OWASP API Top 10 2023: OW
 - **Typical entry points**: Creation endpoints, file uploads, AI token consumption, storage/bandwidth.
 - **Controls**: Quota checks on the server (layered by count, size, frequency); oversell prevention via conditional atomic UPDATE only (check-then-update always oversells); AI consumption metered per round to prevent double-counting; soft rejection with audit trail on limit breach.
 - **API4 vs API6 (both new in OWASP 2023 — do not conflate them into one "rate limiting" problem)**:
-  - **API4 Resource Consumption**: purely technical impact (DoS, cost inflation); countermeasures are generic rate limiting, pagination caps, payload caps — uniformly enforceable at the gateway.
-  - **API6 Sensitive Business Flows**: business impact (scalpers sweeping inventory, seat-holding that locks stock, farming rebates); **every request is legitimate**, and scanners cannot detect it; countermeasures must be chosen per business flow: business-dimension (not global-IP) quotas, human verification, behavioral analysis, device fingerprints. **Business picks the flow first, engineering picks the gate second** — you cannot put a challenge on every endpoint.
-  - **Machine-consumed interfaces (B2B / open APIs / AI channels) are the hardest hit**: they can never pass browser challenges, and OWASP explicitly notes "such interfaces often lack equivalent protections and become easy targets" — they must get equivalent protection through client identity + contract-level quotas + purpose restrictions + audit trails.
+  - **API4 Resource Consumption**: purely technical impact (DoS, cost inflation); countermeasures are generic rate limiting, pagination caps, payload caps — <u>uniformly enforceable at the gateway</u>.<sup>[10]</sup>
+  - **API6 Sensitive Business Flows**: business impact (scalpers sweeping inventory, seat-holding that locks stock, farming rebates); **every request is legitimate**, and scanners cannot detect it; countermeasures must be chosen per business flow: business-dimension (not global-IP) quotas, human verification, behavioral analysis, device fingerprints. **Business picks the flow first, engineering picks the gate second** — <u>you cannot put a challenge on every endpoint</u>.<sup>[11]</sup>
+  - **Machine-consumed interfaces (B2B / open APIs / AI channels) are the hardest hit**: they can never pass browser challenges, and OWASP explicitly notes "such interfaces often lack equivalent protections and become easy targets" — they must get equivalent protection through client identity + contract-level quotas + <u>purpose restrictions + audit trails</u><sup>[12]</sup>.
 - **⚠️ Implementation in this project**: Storage 10 GiB / bandwidth 200 GiB, with quota changes applied in three places in sync; AI tokens metered per round via `ModelCallEndEvent` + `perRoundMetered` to prevent double-counting; MCP session budgets (cumulative call counts/byte windows).
-- **Further reading**: [OWASP API4:2023 Unrestricted Resource Consumption](https://owasp.org/API-Security/editions/2023/en/0xa4-unrestricted-resource-consumption/), [OWASP API6:2023 Unrestricted Access to Sensitive Business Flows](https://owasp.org/API-Security/editions/2023/en/0xa6-unrestricted-access-to-sensitive-business-flows/), [Equivalent protections for machine-consumed interfaces](https://ammune.ai/blog/owasp-api6-2023-unrestricted-access-to-sensitive-business-flows)
 
 ---
 
@@ -279,14 +272,14 @@ The behavioral differences between AI and human penetration testing determine wh
 
 ### 4.2 The Incremental Attack Surface of Agentic AI (2025–2026 Consensus)
 
-Once the AI channel evolves from "bulk curl" to "autonomous agents", multiple risks in this catalog **compound**. Industry reference points: OWASP LLM Top 10 2025 (LLM06 Excessive Agency), OWASP Agentic AI Top 10 (published 2025-12), and Gartner's forecast that by 2029, **more than 50%** of successful attacks on AI agents will target access controls, with prompt injection merely the delivery vehicle; the Five Eyes cyber agencies' first joint agentic AI guidance (2026-04) likewise ranks **permissions** as the top risk class.
+Once the AI channel evolves from "bulk curl" to "autonomous agents", multiple risks in this catalog **compound**. Industry reference points: <u>OWASP LLM Top 10 2025 (LLM06 Excessive Agency)</u><sup>[13]</sup>, <u>OWASP Agentic AI Top 10 (published 2025-12)</u><sup>[14]</sup>, and Gartner's forecast that by 2029, **more than 50%** of successful attacks on AI agents will target access controls, <u>with prompt injection merely the delivery vehicle</u><sup>[15]</sup>; the Five Eyes cyber agencies' first joint agentic AI guidance (2026-04) likewise ranks **permissions** as the top risk class.
 
 **Concrete payloads on the MCP channel (the background thesis, instantiated)**:
 
-- **Tool descriptions are attack payloads**: on every connection the agent fully enumerates tools and reads their descriptions (humans read docs once); the descriptions go straight into the model context and participate in call decisions — Tool Poisoning (instructions hidden in descriptions/parameter schemas), Rug Pull (definition swapped after approval), Tool Shadowing (polluting the usage instructions of a trusted tool). The AMA paper demonstrated empirically that manipulating tool metadata alone (names/descriptions/parameter schemas) can induce an agent to prefer the malicious tool in a black-box setting, with **81%–95%** success rates.
+- **Tool descriptions are attack payloads**: on every connection the agent fully enumerates tools and reads their descriptions (humans read docs once); the descriptions go straight into the model context and participate in call decisions — Tool Poisoning (instructions hidden in descriptions/parameter schemas), Rug Pull (definition swapped after approval), Tool Shadowing (polluting the usage instructions of a trusted tool). The AMA paper demonstrated empirically that manipulating tool metadata alone (names/descriptions/parameter schemas) can induce an agent to prefer the malicious tool in a black-box setting, <u>with **81%–95%** success rates</u><sup>[16]</sup>.
 - **Classic vulnerabilities remain directly reachable**: an MCP server is itself an internet-facing service — whatever the model can call, anyone who can reach the endpoint can call too; missing authentication, IDOR, and command injection existed before MCP, and now there's an extra amplifier: "the model fills in parameters exactly as the text says" (documented case: the official reference postgres server passed queries wrapped in read-only transactions straight through — prefixing with `COMMIT;` escaped the read-only constraint and executed DDL).
 - **Retry is exfiltration**: when an agent retries a failed instruction, it re-sends the entire conversation history (including PII and credentials returned by earlier tools) over the network — every retry is a data exfiltration opportunity.
-- **Where countermeasures land**: Kaspersky's nine recommendations reduce, in this catalog's vocabulary, to four things — an inventory and whitelist of agent/MCP assets (maps to R2 action enumeration), least privilege with task-scoped validity (maps to R1/R15), human approval for high-risk operations (human in the loop), and full ingestion of prompts/tool calls/terminal commands/network traffic into SIEM (maps to R12's audit surface).
+- **Where countermeasures land**: Kaspersky's nine recommendations reduce, in this catalog's vocabulary, to four things — an inventory and whitelist of agent/MCP assets (maps to R2 action enumeration), least privilege with task-scoped validity (maps to R1/R15), human approval for high-risk operations (human in the loop), and full ingestion of prompts/tool calls/terminal commands/network traffic into SIEM (<u>maps to R12's audit surface</u>)<sup>[17]</sup>.
 
 | Failure mode | Maps to this catalog | Notes |
 |---|---|---|
@@ -302,26 +295,30 @@ Once the AI channel evolves from "bulk curl" to "autonomous agents", multiple ri
 2. **Agents are first-class identities**: their own credentials, their own audit trails, their own behavioral baselines, governed with the same rigor as human accounts; no "one bot, one god-mode card".
 3. **Identity never comes from prompts or tool parameters**: "the current user is xxx" passed as a prompt variable or tool parameter = injectable and tamperable (maps to R14). Identity must be passed from the authenticated state into every tool call and downstream hop.
 4. **Authorize the action on every call, not just the session**: validating once at session start and then letting the agent call freely with its own credentials is the standard breeding ground for confused deputy.
-5. **MCP / proxy layers: watch audience validation**: the industry has flagged "MCP servers blindly forwarding client tokens downstream" as an anti-pattern (audits record the wrong caller; audience controls get bypassed); the correct shape is explicit on-behalf-of + a caller identity snapshot + fail-closed — this project's MCP passthrough design (`McpCaller` bearerToken snapshot, reject when empty, no retry on 401) aligns with it; the strengthening direction is downstream validation of token audience (RFC 8707 resource indicators).
+5. **MCP / proxy layers: watch audience validation**: the industry has flagged "MCP servers blindly forwarding client tokens downstream" as an anti-pattern (audits record the wrong caller; audience controls get bypassed); the correct shape is explicit on-behalf-of + a caller identity snapshot + fail-closed — this project's MCP passthrough design (`McpCaller` bearerToken snapshot, reject when empty, no retry on 401) aligns with it; the strengthening direction is downstream validation of token audience (<u>RFC 8707 resource indicators</u>)<sup>[18]</sup>.
 6. **Human in the loop for high-risk actions**: approval confirmations must not travel through the same channel the agent can write back to (a confirmation relayed by the agent is no confirmation at all).
 
-**Further reading**: [OWASP LLM Top 10 2025](https://genai.owasp.org/llm-top-10/), [OWASP Agentic AI resources (2025-12 Agentic Top 10)](https://genai.owasp.org/), [Commentary on Gartner's access control forecast](https://www.safeguard.sh/resources/blog/agentic-ai-access-control-problem), [Confused Deputy governance checklist (NHI Group)](https://nhimg.org/confused-deputy-in-ai-agents-guide)
 
 ---
 
 ## 5. References
 
-- OWASP API Security Top 10 (2023): https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/ (same domain for API1–API10)
-- OWASP Developer Guide · API Top Ten: https://devguide.owasp.org/en/07-training-education/07-api-top-ten/
-- Engineering command idempotency and optimistic locking in CQRS (idempotency keys committed in the same transaction, `UNIQUE(aggregate_id, version)`): https://dev.to/ohugonnot/idempotency-in-cqrs-and-event-sourcing-part-2-commands-projections-and-outbox-4ei
-- Three-layer command validation and strict deserialization in CQRS (rejecting unknown properties, payload caps): https://www.jcwlyf.com/content-51211.html
-- OWASP API6 Sensitive Business Flows (two-layer countermeasures: business / engineering): https://owasp.org/API-Security/editions/2023/en/0xa6-unrestricted-access-to-sensitive-business-flows/
-- Equivalent protections for machine-consumed interfaces (B2B/AI channels): https://ammune.ai/blog/owasp-api6-2023-unrestricted-access-to-sensitive-business-flows
-- [OWASP LLM Top 10 2025](https://genai.owasp.org/llm-top-10/) (LLM06 Excessive Agency) and [OWASP GenAI / Agentic AI Top 10](https://genai.owasp.org/) (2025-12)
-- Gartner: by 2029, >50% of AI agent attacks exploit access-control flaws — https://www.safeguard.sh/resources/blog/agentic-ai-access-control-problem
-- Non-Human Identity · Confused Deputy governance checklist (MCP token audience, identity passthrough anti-patterns): https://nhimg.org/confused-deputy-in-ai-agents-guide
-- EchoLeak (CVE-2025-32711), ForcedLeak (Salesforce Agentforce), the Replit database deletion — public agentic attack cases
-- Agent tool calls turn the UI into an attack surface (survey of Feross / Terence Eden's points: the attack surface expands from "what the user clicked" to "what the agent decides to call"): https://www.botlearn.com.cn/en/community/ai_general/b7e2f280-b9ec-4872-b202-d37b18808799/agent-工具调用正在把-ui-变成攻击面
-- MCP Server attack surface identification (model decisions, context pollution, tool permissions, chained calls; OWASP MCP Top 10 mapping): https://zone.ci/secarticles/wx/570239.html
-- Tool poisoning case study: manipulating tool metadata to induce malicious tool calls (AMA paper, 81%–95% success rates): https://www.freebuf.com/articles/ai-security/495691.html
-- Nine measures for enterprises to guard against AI agents (Kaspersky: asset inventory, whitelisting, least privilege, human approval, isolation, SIEM/XDR): https://cpunews.net/claude-code-cli等ai代理成新攻击面：企业防范ai代理攻击的9项措施
+1. Agent tool calls are turning the UI into an attack surface (survey of Feross / Terence Eden's points: the attack surface expands from "what the user clicked" to "what the agent decides to call"). https://www.botlearn.com.cn/en/community/ai_general/b7e2f280-b9ec-4872-b202-d37b18808799/agent-工具调用正在把-ui-变成攻击面
+2. MCP Server attack surface analysis (model decisions + context pollution + tool permissions + chained calls; OWASP MCP Top 10 mapping). https://zone.ci/secarticles/wx/570239.html
+3. OWASP Developer Guide · API Top Ten. https://devguide.owasp.org/en/07-training-education/07-api-top-ten/
+4. OWASP API5:2023 Broken Function Level Authorization. https://owasp.org/API-Security/editions/2023/en/0xa5-broken-function-level-authorization/
+5. OWASP API1:2023 Broken Object Level Authorization. https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/
+6. OWASP API3:2023 Broken Object Property Level Authorization. https://owasp.org/API-Security/editions/2023/en/0xa3-broken-object-property-level-authorization/
+7. CQRS three-layer command validation and strict deserialization (reject unknown properties, payload caps). https://www.jcwlyf.com/content-51211.html
+8. Engineering idempotency and optimistic locking in CQRS (idempotency key committed in the same transaction, `UNIQUE(aggregate_id, version)`; same root cause as R12). https://dev.to/ohugonnot/idempotency-in-cqrs-and-event-sourcing-part-2-commands-projections-and-outbox-4ei
+9. OWASP Business Logic Security Cheat Sheet (same root cause as R9/R10). https://cheatsheetseries.owasp.org/cheatsheets/Business_Logic_Security_Cheat_Sheet.html
+10. OWASP API4:2023 Unrestricted Resource Consumption. https://owasp.org/API-Security/editions/2023/en/0xa4-unrestricted-resource-consumption/
+11. OWASP API6:2023 Unrestricted Access to Sensitive Business Flows (business-layer / engineering-layer countermeasures). https://owasp.org/API-Security/editions/2023/en/0xa6-unrestricted-access-to-sensitive-business-flows/
+12. Equivalent protections for machine-consumed interfaces (B2B / open APIs / AI channels). https://ammune.ai/blog/owasp-api6-2023-unrestricted-access-to-sensitive-business-flows
+13. OWASP LLM Top 10 2025 (LLM06 Excessive Agency). https://genai.owasp.org/llm-top-10/
+14. OWASP GenAI / Agentic AI Top 10 (published 2025-12). https://genai.owasp.org/
+15. Commentary on Gartner's forecast: by 2029, >50% of successful attacks on AI agents will exploit access control flaws. https://www.safeguard.sh/resources/blog/agentic-ai-access-control-problem
+16. Tool-poisoning empirical study: manipulating tool metadata alone induces calls to malicious tools (AMA paper, 81%–95% success). https://www.freebuf.com/articles/ai-security/495691.html
+17. Nine enterprise countermeasures against AI agents (Kaspersky: asset inventory, whitelists, least privilege, human approval, isolation, SIEM/XDR). https://cpunews.net/claude-code-cli等ai代理成新攻击面：企业防范ai代理攻击的9项措施
+18. Non-human identity · Confused Deputy governance checklist (MCP token audience, identity-passthrough anti-pattern). https://nhimg.org/confused-deputy-in-ai-agents-guide
+19. Public cases: EchoLeak (CVE-2025-32711), ForcedLeak (Salesforce Agentforce), the Replit production-data deletion incident (no single authoritative link; search by CVE ID / incident name).
