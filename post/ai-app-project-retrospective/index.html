@@ -1,0 +1,101 @@
+<!doctype html><html class=no-js lang=zh-cn><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>一个 AI 项目的困局，与 AI 无关：并发、排队与错位的三个月 - 信朴科技 Xomaps®</title><script>(function(e,t){e[t]=e[t].replace("no-js","js")})(document.documentElement,"className")</script><script>(function(e,t){var n,s="roadster-theme";try{n=e.localStorage.getItem(s)}catch{}n!=="dark"&&n!=="light"&&(n=e.matchMedia&&e.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"),t.documentElement.setAttribute("data-theme",n)})(window,document)</script><meta name=description content="分享一个内部 AI 提取项目的真实案例：两块 4090 跑本地模型，日处理量百件级别，却卡在个位数并发上，从 7 月拖到 11 月才对质。逐项拆开看，卡住它的没有一处是 AI 问题——并发是后端工程，容量是系统设计，demo 边界是项目管理。本文按时间线拆解三层问题是怎么叠出来的，以及最后沉淀的两条规矩。"><meta property="og:url" content="https://blog.omaps.cn/post/ai-app-project-retrospective/"><meta property="og:site_name" content="信朴科技 Xomaps®"><meta property="og:title" content="一个 AI 项目的困局，与 AI 无关：并发、排队与错位的三个月"><meta property="og:description" content="分享一个内部 AI 提取项目的真实案例：两块 4090 跑本地模型，日处理量百件级别，却卡在个位数并发上，从 7 月拖到 11 月才对质。逐项拆开看，卡住它的没有一处是 AI 问题——并发是后端工程，容量是系统设计，demo 边界是项目管理。本文按时间线拆解三层问题是怎么叠出来的，以及最后沉淀的两条规矩。"><meta property="og:locale" content="zh_cn"><meta property="og:type" content="article"><meta property="article:section" content="post"><meta property="article:published_time" content="2026-11-15T13:30:00+08:00"><meta property="article:modified_time" content="2026-11-15T13:30:00+08:00"><meta property="article:tag" content="AI 应用"><meta property="article:tag" content="案例分享"><meta property="article:tag" content="工程管理"><meta property="article:tag" content="需求分析"><meta property="article:tag" content="AI 编程"><link rel="shortcut icon" href=/favicon.ico><link rel=alternate hreflang=zh-cn href=https://blog.omaps.cn/post/ai-app-project-retrospective/><link rel=alternate hreflang=en href=https://blog.omaps.cn/en/post/ai-app-project-retrospective/><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/v2-styles.css><link rel=stylesheet href=/css/xomaps.min.bf56254bab8abd7b2c86159ca1287efe9b6aee991de8f79210cd7aa5db49480f.css integrity="sha256-v1YlS6uKvXsshhWcoSh+/ptq7pkd6PeSEM16pdtJSA8="><link rel=icon href=/favicon.svg type=image/svg+xml><link rel=apple-touch-icon href=/apple-touch-icon.png><script>var _hmt=_hmt||[];(function(){var e,t=document.createElement("script");t.src="https://hm.baidu.com/hm.js?91d1ed7b8e9f57cc6d6af12e7feed6ed",e=document.getElementsByTagName("script")[0],e.parentNode.insertBefore(t,e)})()</script><script src=/js/xomaps.min.742161de26d883feec086c191d8ca309575ac83d2a95085a7dc4a91038c6cbf4.js defer></script></head><body class=body><div class="container container--outer"><header class=header><div class="container header__container"><div class=logo><a class=logo__link href=/ title="信朴科技 Xomaps®" rel=home><div class="logo__item logo__text"><div class=logo__title>信朴科技 Xomaps®</div><div class=logo__tagline>AI 原生研发与工程实践</div></div></a></div><nav class=menu><button class=menu__btn aria-haspopup=true aria-expanded=false tabindex=0>
+<span class=menu__btn-title tabindex=-1>菜单</span></button><ul class=menu__list><li class=menu__item><a class=menu__link href=/><span class=menu__text>首页</span></a></li><li class=menu__item><a class=menu__link href=/post/><span class=menu__text>文章</span></a></li><li class=menu__item><a class=menu__link href=/about/><span class=menu__text>关于</span></a></li><li class=menu__item><a class=menu__link href=https://www.omaps.cn><span class=menu__text>官网</span></a></li><li class="menu__item menu__item--lang"><a class=lang-switch__item href=/en/post/ai-app-project-retrospective/ hreflang=en rel=alternate>English</a></li></ul></nav></div></header><div class="wrapper flex"><div class=primary><main class=main role=main><article class=post><header class=post__header><h1 class=post__title>一个 AI 项目的困局，与 AI 无关：并发、排队与错位的三个月</h1><div class="post__meta meta"><div class="meta__item-datetime meta__item"><svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0a14 14 0 110 28 1 1 0 010-28m0 3a3 3 0 100 22 3 3 0 000-22m1 4h-2v8.4l6.8 4.4L22 18l-6-3.8z"/></svg><time class=meta__text datetime=2026-11-15T13:30:00+08:00>2026-11-15</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/ai-%E5%8E%9F%E7%94%9F%E7%A0%94%E5%8F%91/ rel=category>AI 原生研发</a></span></div><div class="meta__item-wordcount meta__item"><svg class="meta__icon icon icon-wordcount" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M10 1H3v14h10V4l-3-3zM5 6h6v1.2H5V6zm0 3h6v1.2H5V9zm0 3h4v1.2H5V12z"/></svg>
+<span class=meta__text>共 3075 字 · 阅读约 7 分钟</span></div><div class="meta__item-pageview meta__item"><svg class="meta__icon icon icon-pageview" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 4C4.9 4 2.3 5.6.9 8c1.4 2.4 4 4 7.1 4s5.7-1.6 7.1-4c-1.4-2.4-4-4-7.1-4zM8 5.1c2.6.0 4.8 1.3 5.9 2.9-1.1 1.6-3.3 2.9-5.9 2.9S3.2 9.6 2.1 8C3.2 6.4 5.4 5.1 8 5.1zM8 6.2a1.8 1.8.0 100 3.6 1.8 1.8.0 000-3.6z"/></svg>
+<span class=meta__text><span class=waline-pageview-count data-path=/post/ai-app-project-retrospective/>0</span> 次浏览</span></div></div></header><div class="content post__content clearfix"><blockquote><p>这是一个内部 AI 工具项目的案例分享。人名、公司、业务场景都做了脱敏，留下的数字只有硬件规格和调用规模——因为案例里的每个判断，恰恰都要靠这几个数字才能看清楚。</p></blockquote><p>先把结论放在前面：这个案例里没有天灾，每一步都是可以选别的走法的。技术判断浮于表面、demo 边界没人管、项目按惯例派给了不合适的人，三层问题叠了三个月，最后一起炸在一场会上。拆开讲。标题就是本文的论点：<strong>把这个项目逐项拆开看，卡住它的没有一处是 AI 问题</strong>——并发管理是后端工程，容量估算是系统设计，demo 边界是项目管理，派活惯例是组织问题。</p><h2 id=一案例背景与经过>一、案例背景与经过</h2><p>背景是一个对保密性要求很高的文档提取场景，只能本地部署。团队用两块 4090 跑一个 26B 的开源模型做提取，7 月份以 demo 形式交付验证，效果基本满足需求。</p><p>问题出在之后的三个月。用户从一个小组扩大到各分支机构，日处理量到了百件级别，而系统实测峰值并发只有个位数——两个人同时用就开始排队、变慢、报错。业务方在群里反映了一个多月，10 月初明确提出要评估设备扩容，得到的答复是暂时没有时间评估。到 11 月开会对质，双方对项目状态的认知差距才暴露出来：开发认为这只是一个待立项的 demo，从没承诺过多人可用；业务认为这是一个已经上线、已经在支撑日常工作的系统。</p><p>会上还有几个细节值得记录。开发对并发问题的第一反应是引入缓存和限流组件、搭建完整的排队机制，排期以周计；对扩容评估的第一反应是立项流程——项目尚未正式立项，此前只能算应急支持；而业务负责人当天就给出了人工调度方案：把大任务按时间段错开，两个人并行用，够用。</p><h2 id=二案例里的五个关键节点>二、案例里的五个关键节点</h2><p>把三个月的时间线拆开，每个节点都有更便宜的走法。</p><h3 id=1慢直接归因到设备>1、&ldquo;慢"直接归因到设备</h3><p>系统一变慢，结论就是设备性能不足，出路就剩两条：采购扩容，或者签保密协议上云。这两条路一个要钱、一个要周期，恰好都是最贵的。但从没人回头问一句：慢的到底是什么——是模型推理慢，是多人抢同一块卡，还是任务根本没人排队？</p><h3 id=2没人算过一笔容量账>2、没人算过一笔容量账</h3><p>把业务方给的几个数放在一起看，结论其实早就有了：</p><table><thead><tr><th>关键数字</th><th>规模</th><th>来源</th></tr></thead><tbody><tr><td>日处理量</td><td>百件级别</td><td>业务方给出</td></tr><tr><td>峰值并发</td><td>个位数</td><td>实测</td></tr><tr><td>单件提取耗时</td><td>分钟级</td><td>模型推理</td></tr><tr><td>设备</td><td>两块 4090 + 26B 本地模型</td><td>固定资产</td></tr></tbody></table><p>按日百件、单件分钟级计算，两块卡的日产能远大于日处理量。缺的从来不是算力，只是一个把瞬时请求排队的机制。这笔账小学算术就够，但三个月里没有人算过。</p><h3 id=3最关键的需求没问出口>3、最关键的需求没问出口</h3><p>会上业务负责人明确表示，这个场景本质是批处理：提交一批文件后等待一段时间完全可以接受，等待期间可以去做别的事。这句话一出，整个问题就变性质了——这是纯批处理场景，不需要实时交互，一个读目录、按顺序批量处理的队列就能解决，连 Redis 都未必需要。</p><p>需求侧最关键的一条信息，是"用户能不能等&rdquo;。三个月里没有人问过。没问这一句，所有人就只能在"买设备"和"上云"两条贵路里打转。</p><h3 id=4方案报成最重的那个>4、方案报成最重的那个</h3><p>被问到怎么解决排队，第一反应是引入缓存、限流和完整的队列服务，排期以周计。事后接手看代码，实际需要的只是一个目录扫描加任务状态表，一两天能落地。</p><p>这里有一条值得写进团队规范的经验：<strong>对某类问题没有实战经验的人，报出的工期永远是最保守的那个</strong>，因为他评估的不是"这个问题多难"，而是"我最坏情况能不能兜住"。不懂并发不可怕，可怕的是不知道这类问题存在轻量解法，只能套用听过的最重方案。</p><h3 id=5被要求评估时选择了回避>5、被要求评估时选择了回避</h3><p>10 月初业务方要求评估扩容，得到的答复是暂时没有时间评估。做一次扩容评估需要几天？大概率不超过三天。拒绝评估省下了三天，付出的是业务方对 IT 判断力的信任——从这一刻起，后面所有解释在业务方耳中都是借口。会上业务方的激烈态度，火药就是那时候埋下的。</p><h2 id=三案例背后的三层问题>三、案例背后的三层问题</h2><p>五个节点串起来看，指向三个更深层的问题。</p><h3 id=1经验错位应用层经验被当成了工程经验>1、经验错位：应用层经验被当成了工程经验</h3><p>这位同事确实做过多个 AI 项目，但那些项目的"AI 经验"本质上是调 API、拼提示词、做交互页面——AI 是产品里的一个功能点。而这个案例暴露的所有问题，没有一个是 AI 问题：并发管理是后端工程，容量估算是系统设计，用户量调研是需求分析，demo 边界是项目管理。</p><p>AI 项目的难点七成在传统软件工程，三成才在模型。他的经验结构正好相反——只有那三成，缺的恰恰是七成。&ldquo;做过多个 AI 项目"这个标签，掩盖了经验结构的错位。</p><h3 id=2边界错位demo-的保质期没人管理>2、边界错位：demo 的保质期没人管理</h3><p>demo 交付时，开发心里的剧本是先验证可行性、再正式立项、再采购设备变正式项目。业务的剧本是工具能用就先用起来，人多就往里拉人。两个剧本没有任何机制对齐：用户量扩大那天没人拉警报，说清楚这只是 demo、并发上限个位数、随时会坏、需要立项；也没人定期检查 demo 被用到了什么程度。三个月里，&ldquo;没立项"既是开发的挡箭牌，也是双方共同的盲区。</p><p>demo 和正式系统之间应该有一条明确的管理边界：demo 交付时约定用途和上限，超限使用必须触发升级流程。这条边界谁该守？开发的直接上级、业务方的对接人、立项流程本身，都有份。事后追责一个人的沟通失误，解决不了下一次。</p><h3 id=3角色错位项目按惯例派活而不是按技能派活>3、角色错位：项目按惯例派活，而不是按技能派活</h3><p>为什么一个前端工程师会独自承担一个涉及并发、队列、算力调度的项目？因为组织里有一条惯例：无需服务端支持、无状态的工具类应用，一直交给他。这条惯例在过去的场景里是合理的，但 AI 应用项目的重心天然在后端——排队、调度、可靠性、容量，全是系统工程问题。</p><p>组织按惯性派活，让最没有系统工程能力的人独自面对最需要系统工程能力的场景，然后期待他做出正确判断。这不合理。前面五个节点里的问题，有一半在这层就注定了。</p><h2 id=四一个反差和两条规矩>四、一个反差和两条规矩</h2><p>案例讲到最后，最讽刺的一点浮出来：这是一个 AI 项目，但参与开发的人从头到尾没用 AI 帮自己解决问题。评估工作量靠拍脑袋报出以周计的工期，遇到不会的并发问题第一反应是找服务端支持、按排期推进，而不是先让 AI 分析代码结构和瓶颈。后来接手的人用 AI 编程助手做了完整的代码分析、结构重构和方案验证，时间以天计。</p><p><strong>会用 AI 的产品，不等于会用 AI 工作的人。</strong> 到 2026 年，&ldquo;我不会后端"已经不再是不可逾越的墙——墙是自己不往 AI 方向看，砌出来的。</p><p>这个案例沉淀两条规矩，后续 AI 项目直接执行：</p><p>1）<strong>立项先问四个数</strong>：用户数、峰值并发、单件耗时、日调用量。这四个数一出，买设备还是做排队，根本不需要开会争论，算术会给出答案。</p><p>2）<strong>两周以上的排期，先跑一遍 AI 验证再报数</strong>：任何超过两周的评估，先做一次 AI 辅助的代码分析和方案对比，确认最重的方案确实是最必要的方案，再报工期。不懂的领域靠记忆和听过的方案报数，在 AI 编程时代已经构成一种工作失职。</p><h2 id=五真实用量峰值一天一百多次>五、真实用量：峰值一天一百多次</h2><p>看这张图，就知道这场风波有多不成比例。这是 11 月 2 日到 15 日的每日调用总数，峰值 132 次，多数日子几十到一百多次，还有两天几乎为零。</p><p><img src=/images/ai-app-daily-usage.png alt="11 月 2 日至 15 日每日调用总数，峰值 132 次/日"></p><p>按这个量算一笔账：一天一百多次提取，单次分钟级，全部串行跑完也就大半天，两块卡有一半时间闲在那里。而它实际换来的是：排队、扩容申请、上云评估、立项流程，以及两个部门在会上的正面对质。</p><p><strong>技术判断造成的损失，往往和问题的物理规模无关，和判断出错的环节层级成正比。</strong> 一句"用户能不能等"没问出口，就被放大成三个月的任务积压和一场跨部门会议——这才是这个案例里最值得记住的地方。</p><h2 id=延伸阅读本站>延伸阅读（本站）</h2><ul><li><a href=/post/enterprise-ai-landing/>企业 AI 落地：企业上下文、内部 FDE 与场景闸门</a></li><li><a href=/post/ai-native-sdlc-gates/>AI 原生研发：产物链、门禁与度量</a></li></ul></div><footer class=post__footer><div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M4 0h8s2 0 4 2l15 15s2 2 0 4L21 31s-2 2-4 0L2 16s-2-2-2-4V3s0-3 4-3m3 10a3 3 0 000-6 3 3 0 000 6"/></svg><ul class=tags__list><li class=tags__item><a class="tags__link btn" href rel=tag>AI 应用</a></li><li class=tags__item><a class="tags__link btn" href rel=tag>案例分享</a></li><li class=tags__item><a class="tags__link btn" href rel=tag>工程管理</a></li><li class=tags__item><a class="tags__link btn" href rel=tag>需求分析</a></li><li class=tags__item><a class="tags__link btn" href rel=tag>AI 编程</a></li></ul></div></footer></article></main><nav class="pager flex"><div class="pager__item pager__item--prev"><a class=pager__link href=/post/customer-centric-workflow-engine/ rel=prev><span class=pager__subtitle>«&#8201;上一篇</span><p class=pager__title>AI 不可替代的：面向客户的主营业务流程与落地引擎</p></a></div><div class="pager__item pager__item--next"><a class=pager__link href=/post/attribution-is-not-resolution/ rel=next><span class=pager__subtitle>下一篇&#8201;»</span><p class=pager__title>归因完成不等于解决：AI 归因、组织上下文与低成本绕行</p></a></div></nav><section class=comments><div id=waline class=waline-container></div></section></div><aside class=sidebar><div class="widget-toc widget"><h4 class=widget__title>目录</h4><div class="widget__content widget-toc__menu"><nav id=TableOfContents><ul><li><a href=#一案例背景与经过>一、案例背景与经过</a></li><li><a href=#二案例里的五个关键节点>二、案例里的五个关键节点</a><ul><li><a href=#1慢直接归因到设备>1、&ldquo;慢"直接归因到设备</a></li><li><a href=#2没人算过一笔容量账>2、没人算过一笔容量账</a></li><li><a href=#3最关键的需求没问出口>3、最关键的需求没问出口</a></li><li><a href=#4方案报成最重的那个>4、方案报成最重的那个</a></li><li><a href=#5被要求评估时选择了回避>5、被要求评估时选择了回避</a></li></ul></li><li><a href=#三案例背后的三层问题>三、案例背后的三层问题</a><ul><li><a href=#1经验错位应用层经验被当成了工程经验>1、经验错位：应用层经验被当成了工程经验</a></li><li><a href=#2边界错位demo-的保质期没人管理>2、边界错位：demo 的保质期没人管理</a></li><li><a href=#3角色错位项目按惯例派活而不是按技能派活>3、角色错位：项目按惯例派活，而不是按技能派活</a></li></ul></li><li><a href=#四一个反差和两条规矩>四、一个反差和两条规矩</a></li><li><a href=#五真实用量峰值一天一百多次>五、真实用量：峰值一天一百多次</a></li><li><a href=#延伸阅读本站>延伸阅读（本站）</a></li></ul></nav></div></div><div class="widget-recent widget"><h4 class=widget__title>近期文章</h4><div class=widget__content><ul class=widget__list><li class=widget__item><a class=widget__link href=/post/mcp-tool-bus/>MCP 工具总线：我的疑问、方案取舍与落地边界</a></li><li class=widget__item><a class=widget__link href=/post/digital-worker-as-process-node/>数字员工生产落地案例：节点、账号与退回机制</a></li><li class=widget__item><a class=widget__link href=/post/voice-office-carrier-upgrade/>从文字到语音：办公信息的载体升级与 AI 的全景理解</a></li><li class=widget__item><a class=widget__link href=/post/attribution-is-not-resolution/>归因完成不等于解决：AI 归因、组织上下文与低成本绕行</a></li><li class=widget__item><a class=widget__link href=/post/ai-app-project-retrospective/>一个 AI 项目的困局，与 AI 无关：并发、排队与错位的三个月</a></li></ul></div></div><div class="widget-categories widget"><h4 class=widget__title>分类</h4><div class=widget__content><ul class=widget__list><li class=widget__item><a class=widget__link href=/categories/ai-%E5%8E%9F%E7%94%9F%E7%A0%94%E5%8F%91/>AI 原生研发</a></li><li class=widget__item><a class=widget__link href=/categories/%E4%BC%81%E4%B8%9A-ai-%E8%90%BD%E5%9C%B0/>企业 AI 落地</a></li><li class=widget__item><a class=widget__link href=/categories/%E6%9E%B6%E6%9E%84%E4%B8%8E%E5%AE%89%E5%85%A8/>架构与安全</a></li></ul></div></div><div class="widget-taglist widget"><h4 class=widget__title>标签</h4><div class=widget__content><a class="widget-taglist__link widget__link btn" href=/tags/agent/ title=Agent>Agent</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/agent-%E5%AE%89%E5%85%A8/ title="Agent 安全">Agent 安全</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/ai/ title=AI>AI</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/ai-%E7%BC%96%E7%A8%8B/ title="AI 编程">AI 编程</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/ai-%E5%88%86%E8%BA%AB/ title="AI 分身">AI 分身</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/ai-%E5%BA%94%E7%94%A8/ title="AI 应用">AI 应用</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/ai-%E5%8E%9F%E7%94%9F/ title="AI 原生">AI 原生</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/api-%E6%B2%BB%E7%90%86/ title="API 治理">API 治理</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/bpm/ title=BPM>BPM</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/it%E6%89%98%E7%AE%A1/ title=IT托管>IT托管</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/mcp/ title=MCP>MCP</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/msp/ title=MSP>MSP</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/rest/ title=REST>REST</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/sdlc/ title=SDLC>SDLC</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E5%AE%89%E5%85%A8%E8%BE%B9%E7%95%8C/ title=安全边界>安全边界</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E6%A1%88%E4%BE%8B%E5%88%86%E4%BA%AB/ title=案例分享>案例分享</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E5%BA%A6%E9%87%8F/ title=度量>度量</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E5%A4%9A%E7%A7%9F%E6%88%B7/ title=多租户>多租户</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E5%B7%A5%E7%A8%8B%E7%AE%A1%E7%90%86/ title=工程管理>工程管理</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E5%B7%A5%E7%A8%8B%E6%95%88%E8%83%BD/ title=工程效能>工程效能</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8/ title=工具调用>工具调用</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E9%89%B4%E6%9D%83%E8%AE%BE%E8%AE%A1/ title=鉴权设计>鉴权设计</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E6%B5%81%E7%A8%8B%E6%94%B9%E9%80%A0/ title=流程改造>流程改造</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E6%B5%81%E7%A8%8B%E5%BC%95%E6%93%8E/ title=流程引擎>流程引擎</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E6%B5%81%E7%A8%8B%E8%87%AA%E5%8A%A8%E5%8C%96/ title=流程自动化>流程自动化</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E8%90%BD%E5%9C%B0%E8%B7%AF%E5%BE%84/ title=落地路径>落地路径</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E9%97%A8%E7%A6%81%E8%AE%BE%E8%AE%A1/ title=门禁设计>门禁设计</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E5%B9%B4%E5%BA%A6%E8%A7%84%E5%88%92/ title=年度规划>年度规划</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E9%85%8D%E7%BD%AE%E5%8C%96/ title=配置化>配置化</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E4%BC%81%E4%B8%9A-ai/ title="企业 AI">企业 AI</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E5%85%A8%E6%81%AF%E9%87%87%E9%9B%86/ title=全息采集>全息采集</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1/ title=权限设计>权限设计</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E4%B8%8A%E4%B8%8B%E6%96%87%E5%B7%A5%E7%A8%8B/ title=上下文工程>上下文工程</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E6%95%B0%E5%AD%97%E5%91%98%E5%B7%A5/ title=数字员工>数字员工</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E6%8E%A2%E8%AE%A8/ title=探讨>探讨</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E7%BD%91%E7%BB%9C%E6%8E%92%E9%9A%9C/ title=网络排障>网络排障</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E5%A8%81%E8%83%81%E5%BB%BA%E6%A8%A1/ title=威胁建模>威胁建模</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E7%B3%BB%E7%BB%9F%E6%8E%A5%E5%85%A5/ title=系统接入>系统接入</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E5%8D%8F%E8%AE%AE%E8%AE%BE%E8%AE%A1/ title=协议设计>协议设计</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90/ title=需求分析>需求分析</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E8%AF%AD%E9%9F%B3%E5%8A%9E%E5%85%AC/ title=语音办公>语音办公</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E8%BD%BD%E4%BD%93%E5%8D%87%E7%BA%A7/ title=载体升级>载体升级</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E6%B2%BB%E7%90%86/ title=治理>治理</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E6%99%BA%E8%83%BD%E4%BD%93/ title=智能体>智能体</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E4%B8%AD%E5%B0%8F%E4%BC%81%E4%B8%9A/ title=中小企业>中小企业</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E7%BB%84%E7%BB%87%E8%83%BD%E5%8A%9B/ title=组织能力>组织能力</a></div></div></aside></div><footer class=footer><div class="container footer__container flex"><div class=footer__links><a class=footer__link href=https://www.xomaps.com>公司官网 www.xomaps.com</a> | <a class=footer__link href=https://github.com/xomaps>GitHub</a></div><div class=footer__copyright>&copy; 2026 信朴科技（Xomaps®）.
+<span class=footer__copyright-credits>基于 <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> 引擎和 <a href=https://github.com/mansoorbarri/roadster/ rel="nofollow noopener" target=_blank>Roadster</a> 主题</span></div></div></footer><link rel=stylesheet href=/waline/waline.css><script type=module>
+import { init, pageviewCount } from '\/waline\/waline.js';
+
+const serverURL = 'https:\/\/waline.jokeway.workers.dev';
+const path = window.location.pathname;
+
+
+const degrade = () => {
+	document.querySelectorAll('.meta__item-pageview').forEach((el) => el.remove());
+	document.querySelectorAll('.comments').forEach((el) => el.remove());
+};
+
+
+const timeoutSignal = (ms) => {
+	const c = new AbortController();
+	setTimeout(() => c.abort(), ms);
+	return c.signal;
+};
+
+
+fetch(serverURL + '/api/comment?path=' + encodeURIComponent(path) + '&pageSize=1&page=1', {
+	signal: timeoutSignal(5000),
+})
+	.then((resp) => {
+		if (!resp.ok) throw new Error('waline server responded ' + resp.status);
+		
+		pageviewCount({ serverURL, path });
+		init({
+			el: '#waline',
+			serverURL,
+			path,
+			
+			
+			lang: 'zh-CN',
+			
+			login: 'disable',
+			meta: ['nick'],
+			requiredMeta: ['nick'],
+			placeholder: '写下你的评论（经审核通过后才会显示）',
+			
+			noCopyright: true,
+			
+			emoji: false,
+			search: false,
+			reaction: false,
+		});
+	})
+	.catch(degrade);
+</script></div><button class=theme-toggle type=button aria-label="Switch to dark theme" title="Switch to dark theme">
+<span class=theme-toggle__label>Theme</span>
+</button>
+<script async defer src=/js/menu.js></script></body></html>

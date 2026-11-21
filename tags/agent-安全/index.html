@@ -1,0 +1,82 @@
+<!doctype html><html class=no-js lang=zh-cn><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Agent 安全 - 信朴科技 Xomaps®</title><script>(function(e,t){e[t]=e[t].replace("no-js","js")})(document.documentElement,"className")</script><script>(function(e,t){var n,s="roadster-theme";try{n=e.localStorage.getItem(s)}catch{}n!=="dark"&&n!=="light"&&(n=e.matchMedia&&e.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"),t.documentElement.setAttribute("data-theme",n)})(window,document)</script><meta name=description content><meta property="og:url" content="https://blog.omaps.cn/tags/agent-%E5%AE%89%E5%85%A8/"><meta property="og:site_name" content="信朴科技 Xomaps®"><meta property="og:title" content="Agent 安全"><meta property="og:description" content="信朴科技（Xomaps®）团队技术博客：点位管理系统、多租户中台、API 治理与工程实践。"><meta property="og:locale" content="zh_cn"><meta property="og:type" content="website"><link rel=alternate type=application/rss+xml href=/tags/agent-%E5%AE%89%E5%85%A8/index.xml title="信朴科技 Xomaps®"><link rel="shortcut icon" href=/favicon.ico><link rel=alternate hreflang=zh-cn href=https://blog.omaps.cn/tags/agent-%E5%AE%89%E5%85%A8/><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/v2-styles.css><link rel=stylesheet href=/css/xomaps.min.bf56254bab8abd7b2c86159ca1287efe9b6aee991de8f79210cd7aa5db49480f.css integrity="sha256-v1YlS6uKvXsshhWcoSh+/ptq7pkd6PeSEM16pdtJSA8="><link rel=icon href=/favicon.svg type=image/svg+xml><link rel=apple-touch-icon href=/apple-touch-icon.png><script>var _hmt=_hmt||[];(function(){var e,t=document.createElement("script");t.src="https://hm.baidu.com/hm.js?91d1ed7b8e9f57cc6d6af12e7feed6ed",e=document.getElementsByTagName("script")[0],e.parentNode.insertBefore(t,e)})()</script><script src=/js/xomaps.min.742161de26d883feec086c191d8ca309575ac83d2a95085a7dc4a91038c6cbf4.js defer></script></head><body class=body><div class="container container--outer"><header class=header><div class="container header__container"><div class=logo><a class=logo__link href=/ title="信朴科技 Xomaps®" rel=home><div class="logo__item logo__text"><div class=logo__title>信朴科技 Xomaps®</div><div class=logo__tagline>AI 原生研发与工程实践</div></div></a></div><nav class=menu><button class=menu__btn aria-haspopup=true aria-expanded=false tabindex=0>
+<span class=menu__btn-title tabindex=-1>菜单</span></button><ul class=menu__list><li class=menu__item><a class=menu__link href=/><span class=menu__text>首页</span></a></li><li class=menu__item><a class=menu__link href=/post/><span class=menu__text>文章</span></a></li><li class=menu__item><a class=menu__link href=/about/><span class=menu__text>关于</span></a></li><li class=menu__item><a class=menu__link href=https://www.omaps.cn><span class=menu__text>官网</span></a></li><li class="menu__item menu__item--lang"><a class=lang-switch__item href=/en/ hreflang=en rel=alternate>English</a></li></ul></nav></div></header><div class="wrapper flex"><div class=primary><main class="main list" role=main><header class=main__header><h1 class=main__title>Agent 安全</h1></header><article class="list__item post"><header class=list__header><h2 class="list__title post__title"><a href=/post/2027-ai-directions/ rel=bookmark>2027 年企业 IT 部门的方向：上下文厚度与研发范围重构</a></h2><div class="list__meta meta"><div class="meta__item-datetime meta__item"><svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0a14 14 0 110 28 1 1 0 010-28m0 3a3 3 0 100 22 3 3 0 000-22m1 4h-2v8.4l6.8 4.4L22 18l-6-3.8z"/></svg><time class=meta__text datetime=2026-11-13T18:00:00+08:00>2026-11-13</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/ai-%E5%8E%9F%E7%94%9F%E7%A0%94%E5%8F%91/ rel=category>AI 原生研发</a></span></div><div class="meta__item-wordcount meta__item"><svg class="meta__icon icon icon-wordcount" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M10 1H3v14h10V4l-3-3zM5 6h6v1.2H5V6zm0 3h6v1.2H5V9zm0 3h4v1.2H5V12z"/></svg>
+<span class=meta__text>共 4217 字 · 阅读约 9 分钟</span></div><div class="meta__item-pageview meta__item"><svg class="meta__icon icon icon-pageview" width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 4C4.9 4 2.3 5.6.9 8c1.4 2.4 4 4 7.1 4s5.7-1.6 7.1-4c-1.4-2.4-4-4-7.1-4zM8 5.1c2.6.0 4.8 1.3 5.9 2.9-1.1 1.6-3.3 2.9-5.9 2.9S3.2 9.6 2.1 8C3.2 6.4 5.4 5.1 8 5.1zM8 6.2a1.8 1.8.0 100 3.6 1.8 1.8.0 000-3.6z"/></svg>
+<span class=meta__text><span class=waline-pageview-count data-path=/post/2027-ai-directions/>0</span> 次浏览</span></div></div></header><div class="content list__excerpt post__content clearfix"><blockquote><p>这是年度规划稿：明年做什么、为什么是这几件、做到什么程度算完成。文中不带具体项目和客户信息，方法谁都能用。</p></blockquote><h2 id=先给结论>先给结论</h2><p>2027 年的重点不是换更好的模型。模型谁都能买，一年一年看下去，在选模型这件事上多花心思，回报越来越低。真正拉开差距的是两件事，外加一条不能破的底线：</p></div><div class="list__footer clearfix"><a class="list__footer-readmore btn" href=/post/2027-ai-directions/>阅读全文…</a></div></article></main></div><aside class=sidebar><div class="widget-recent widget"><h4 class=widget__title>近期文章</h4><div class=widget__content><ul class=widget__list><li class=widget__item><a class=widget__link href=/post/mcp-tool-bus/>MCP 工具总线：我的疑问、方案取舍与落地边界</a></li><li class=widget__item><a class=widget__link href=/post/digital-worker-as-process-node/>数字员工生产落地案例：节点、账号与退回机制</a></li><li class=widget__item><a class=widget__link href=/post/voice-office-carrier-upgrade/>从文字到语音：办公信息的载体升级与 AI 的全景理解</a></li><li class=widget__item><a class=widget__link href=/post/attribution-is-not-resolution/>归因完成不等于解决：AI 归因、组织上下文与低成本绕行</a></li><li class=widget__item><a class=widget__link href=/post/ai-app-project-retrospective/>一个 AI 项目的困局，与 AI 无关：并发、排队与错位的三个月</a></li></ul></div></div><div class="widget-categories widget"><h4 class=widget__title>分类</h4><div class=widget__content><ul class=widget__list><li class=widget__item><a class=widget__link href=/categories/ai-%E5%8E%9F%E7%94%9F%E7%A0%94%E5%8F%91/>AI 原生研发</a></li><li class=widget__item><a class=widget__link href=/categories/%E4%BC%81%E4%B8%9A-ai-%E8%90%BD%E5%9C%B0/>企业 AI 落地</a></li><li class=widget__item><a class=widget__link href=/categories/%E6%9E%B6%E6%9E%84%E4%B8%8E%E5%AE%89%E5%85%A8/>架构与安全</a></li></ul></div></div><div class="widget-taglist widget"><h4 class=widget__title>标签</h4><div class=widget__content><a class="widget-taglist__link widget__link btn" href=/tags/agent/ title=Agent>Agent</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/agent-%E5%AE%89%E5%85%A8/ title="Agent 安全">Agent 安全</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/ai/ title=AI>AI</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/ai-%E7%BC%96%E7%A8%8B/ title="AI 编程">AI 编程</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/ai-%E5%88%86%E8%BA%AB/ title="AI 分身">AI 分身</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/ai-%E5%BA%94%E7%94%A8/ title="AI 应用">AI 应用</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/ai-%E5%8E%9F%E7%94%9F/ title="AI 原生">AI 原生</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/api-%E6%B2%BB%E7%90%86/ title="API 治理">API 治理</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/bpm/ title=BPM>BPM</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/it%E6%89%98%E7%AE%A1/ title=IT托管>IT托管</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/mcp/ title=MCP>MCP</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/msp/ title=MSP>MSP</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/rest/ title=REST>REST</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/sdlc/ title=SDLC>SDLC</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E5%AE%89%E5%85%A8%E8%BE%B9%E7%95%8C/ title=安全边界>安全边界</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E6%A1%88%E4%BE%8B%E5%88%86%E4%BA%AB/ title=案例分享>案例分享</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E5%BA%A6%E9%87%8F/ title=度量>度量</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E5%A4%9A%E7%A7%9F%E6%88%B7/ title=多租户>多租户</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E5%B7%A5%E7%A8%8B%E7%AE%A1%E7%90%86/ title=工程管理>工程管理</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E5%B7%A5%E7%A8%8B%E6%95%88%E8%83%BD/ title=工程效能>工程效能</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8/ title=工具调用>工具调用</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E9%89%B4%E6%9D%83%E8%AE%BE%E8%AE%A1/ title=鉴权设计>鉴权设计</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E6%B5%81%E7%A8%8B%E6%94%B9%E9%80%A0/ title=流程改造>流程改造</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E6%B5%81%E7%A8%8B%E5%BC%95%E6%93%8E/ title=流程引擎>流程引擎</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E6%B5%81%E7%A8%8B%E8%87%AA%E5%8A%A8%E5%8C%96/ title=流程自动化>流程自动化</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E8%90%BD%E5%9C%B0%E8%B7%AF%E5%BE%84/ title=落地路径>落地路径</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E9%97%A8%E7%A6%81%E8%AE%BE%E8%AE%A1/ title=门禁设计>门禁设计</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E5%B9%B4%E5%BA%A6%E8%A7%84%E5%88%92/ title=年度规划>年度规划</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E9%85%8D%E7%BD%AE%E5%8C%96/ title=配置化>配置化</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E4%BC%81%E4%B8%9A-ai/ title="企业 AI">企业 AI</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E5%85%A8%E6%81%AF%E9%87%87%E9%9B%86/ title=全息采集>全息采集</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1/ title=权限设计>权限设计</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E4%B8%8A%E4%B8%8B%E6%96%87%E5%B7%A5%E7%A8%8B/ title=上下文工程>上下文工程</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E6%95%B0%E5%AD%97%E5%91%98%E5%B7%A5/ title=数字员工>数字员工</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E6%8E%A2%E8%AE%A8/ title=探讨>探讨</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E7%BD%91%E7%BB%9C%E6%8E%92%E9%9A%9C/ title=网络排障>网络排障</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E5%A8%81%E8%83%81%E5%BB%BA%E6%A8%A1/ title=威胁建模>威胁建模</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E7%B3%BB%E7%BB%9F%E6%8E%A5%E5%85%A5/ title=系统接入>系统接入</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E5%8D%8F%E8%AE%AE%E8%AE%BE%E8%AE%A1/ title=协议设计>协议设计</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90/ title=需求分析>需求分析</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E8%AF%AD%E9%9F%B3%E5%8A%9E%E5%85%AC/ title=语音办公>语音办公</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E8%BD%BD%E4%BD%93%E5%8D%87%E7%BA%A7/ title=载体升级>载体升级</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E6%B2%BB%E7%90%86/ title=治理>治理</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E6%99%BA%E8%83%BD%E4%BD%93/ title=智能体>智能体</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E4%B8%AD%E5%B0%8F%E4%BC%81%E4%B8%9A/ title=中小企业>中小企业</a>
+<a class="widget-taglist__link widget__link btn" href=/tags/%E7%BB%84%E7%BB%87%E8%83%BD%E5%8A%9B/ title=组织能力>组织能力</a></div></div></aside></div><footer class=footer><div class="container footer__container flex"><div class=footer__links><a class=footer__link href=https://www.xomaps.com>公司官网 www.xomaps.com</a> | <a class=footer__link href=https://github.com/xomaps>GitHub</a></div><div class=footer__copyright>&copy; 2026 信朴科技（Xomaps®）.
+<span class=footer__copyright-credits>基于 <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> 引擎和 <a href=https://github.com/mansoorbarri/roadster/ rel="nofollow noopener" target=_blank>Roadster</a> 主题</span></div></div></footer><script type=module>
+import { init, pageviewCount } from '\/waline\/waline.js';
+
+const serverURL = 'https:\/\/waline.jokeway.workers.dev';
+const path = window.location.pathname;
+
+
+const degrade = () => {
+	document.querySelectorAll('.meta__item-pageview').forEach((el) => el.remove());
+	document.querySelectorAll('.comments').forEach((el) => el.remove());
+};
+
+
+const timeoutSignal = (ms) => {
+	const c = new AbortController();
+	setTimeout(() => c.abort(), ms);
+	return c.signal;
+};
+
+
+fetch(serverURL + '/api/comment?path=' + encodeURIComponent(path) + '&pageSize=1&page=1', {
+	signal: timeoutSignal(5000),
+})
+	.then((resp) => {
+		if (!resp.ok) throw new Error('waline server responded ' + resp.status);
+		
+		pageviewCount({ serverURL, path });
+	})
+	.catch(degrade);
+</script></div><button class=theme-toggle type=button aria-label="Switch to dark theme" title="Switch to dark theme">
+<span class=theme-toggle__label>Theme</span>
+</button>
+<script async defer src=/js/menu.js></script></body></html>
